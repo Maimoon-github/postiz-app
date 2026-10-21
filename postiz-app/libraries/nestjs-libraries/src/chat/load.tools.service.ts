@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Agent } from '@mastra/core/agent';
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { Memory } from '@mastra/memory';
+
+const ollamaProvider = createOpenAI({
+  baseURL: process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',
+  apiKey: process.env.OPENAI_API_KEY || 'ollama',
+});
 import { pStore } from '@gitroom/nestjs-libraries/chat/mastra.store';
 import { array, object, string } from 'zod';
 import { ModuleRef } from '@nestjs/core';
@@ -113,7 +118,9 @@ export class LoadToolsService {
       )}
 `;
       },
-      model: openai('gpt-5.2'),
+      model: ollamaProvider.chat(
+        process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M'
+      ),
       tools,
       memory: new Memory({
         storage: pStore,

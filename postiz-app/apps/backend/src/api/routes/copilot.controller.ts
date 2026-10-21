@@ -13,6 +13,12 @@ import {
   OpenAIAdapter,
   copilotRuntimeNodeHttpEndpoint,
 } from '@copilotkit/runtime';
+import OpenAI from 'openai';
+
+const ollamaOpenAi = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'ollama',
+  baseURL: process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',
+});
 import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.request';
 import { Organization } from '@prisma/client';
 import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
@@ -60,7 +66,8 @@ export class CopilotController {
       cors: copilotCors(),
       runtime: new CopilotRuntime(),
       serviceAdapter: new OpenAIAdapter({
-        model: 'gpt-4.1',
+        openai: ollamaOpenAi as any,
+        model: process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M',
       }),
     });
 
@@ -106,7 +113,8 @@ export class CopilotController {
       cors: copilotCors(),
       runtime,
       serviceAdapter: new OpenAIAdapter({
-        model: 'gpt-4.1',
+        openai: ollamaOpenAi as any,
+        model: process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M',
       }),
     });
 

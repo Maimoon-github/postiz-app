@@ -23,9 +23,13 @@ const tools = !process.env.TAVILY_API_KEY
 const toolNode = new ToolNode(tools);
 
 const model = new ChatOpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-',
-  model: 'gpt-4.1',
+  apiKey: process.env.OPENAI_API_KEY || 'ollama',
+  model: process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M',
   temperature: 0.7,
+  configuration: {
+    baseURL:
+      process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',
+  },
 });
 
 const dalle = new DallEAPIWrapper({

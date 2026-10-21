@@ -9,9 +9,13 @@ import { agentTopics } from '@gitroom/nestjs-libraries/agent/agent.topics';
 import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
 
 const model = new ChatOpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-',
-  model: 'gpt-4o-2024-08-06',
+  apiKey: process.env.OPENAI_API_KEY || 'ollama',
+  model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:4b-q4_K_M',
   temperature: 0,
+  configuration: {
+    baseURL:
+      process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',
+  },
 });
 
 interface WorkflowChannelsState {

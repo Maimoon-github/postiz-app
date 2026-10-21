@@ -23,10 +23,10 @@ fi
 case "$MODE" in
   full)
     if docker image inspect localhost/postiz:local >/dev/null 2>&1 && [ "${2:-}" != "--rebuild" ]; then
-      echo "[1/5] Starting all 11 containers in the Postiz stack (using built localhost/postiz:local image)..."
+      echo "[1/5] Starting all 12 containers in the Postiz stack (using built localhost/postiz:local image)..."
       docker compose -f docker-compose.local.yaml up -d
     else
-      echo "[1/5] Building and starting all 11 containers in the Postiz stack..."
+      echo "[1/5] Building and starting all 12 containers in the Postiz stack..."
       docker compose -f docker-compose.local.yaml up -d --build
     fi
 
@@ -38,13 +38,33 @@ case "$MODE" in
       sleep 2
     done
 
-    echo "[3/5] Building and activating remaining workspace apps (sdk, commands, extension) inside 'postiz'..."
+    echo "[3/5] Syncing local Ollama LLM integration & activating workspace apps inside 'postiz'..."
+    docker cp .env postiz:/app/.env
+    docker cp libraries/nestjs-libraries/src/chat/load.tools.service.ts postiz:/app/libraries/nestjs-libraries/src/chat/load.tools.service.ts
+    docker cp apps/backend/src/api/routes/copilot.controller.ts postiz:/app/apps/backend/src/api/routes/copilot.controller.ts
+    docker cp libraries/nestjs-libraries/src/openai/openai.service.ts postiz:/app/libraries/nestjs-libraries/src/openai/openai.service.ts
+    docker cp libraries/nestjs-libraries/src/agent/agent.graph.service.ts postiz:/app/libraries/nestjs-libraries/src/agent/agent.graph.service.ts
+    docker cp libraries/nestjs-libraries/src/agent/agent.graph.insert.service.ts postiz:/app/libraries/nestjs-libraries/src/agent/agent.graph.insert.service.ts
+    docker cp libraries/nestjs-libraries/src/database/prisma/autopost/autopost.service.ts postiz:/app/libraries/nestjs-libraries/src/database/prisma/autopost/autopost.service.ts
     docker cp apps/commands/src/main.ts postiz:/app/apps/commands/src/main.ts
     docker cp apps/commands/src/tasks/agent.run.ts postiz:/app/apps/commands/src/tasks/agent.run.ts
     docker cp apps/commands/src/command.module.ts postiz:/app/apps/commands/src/command.module.ts
     docker cp apps/commands/package.json postiz:/app/apps/commands/package.json
     docker exec postiz sh -c "
       set -e
+      if [ ! -f /app/.ollama-synced ]; then
+        echo '  -> Rebuilding backend & orchestrator with local Ollama models...'
+        pm2 stop backend orchestrator || true
+        pkill -9 -f 'dist/apps/backend' || true
+        pkill -9 -f 'dist/apps/orchestrator' || true
+        pnpm --filter ./apps/backend run build
+        pnpm --filter ./apps/orchestrator run build
+        pm2 delete backend orchestrator || true
+        cd /app/apps/backend && pm2 start pnpm --name backend -- start && cd /app
+        cd /app/apps/orchestrator && pm2 start pnpm --name orchestrator -- start && cd /app
+        touch /app/.ollama-synced
+      fi
+
       # 1. Build @postiz/node SDK (apps/sdk)
       if [ ! -f /app/apps/sdk/dist/index.js ]; then
         echo '  -> Building apps/sdk (@postiz/node)...'
@@ -80,6 +100,23 @@ case "$MODE" in
     curl -sS -o /dev/null -w "  - pgAdmin 4 UI (:8085):                     %{http_code}\n" http://localhost:8085/login
     curl -sS -o /dev/null -w "  - RedisInsight UI (:5540):                  %{http_code}\n" http://localhost:5540/
     curl -sS -o /dev/null -w "  - Sentry Spotlight UI (:8969):              %{http_code}\n" http://localhost:8969/
+    docker exec postiz node -e "
+      fetch('http://host.docker.internal:11435/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ollama' },
+        body: JSON.stringify({
+          model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:4b-q4_K_M',
+          messages: [{ role: 'user', content: 'Say OK' }],
+          max_tokens: 16
+        })
+      }).then(async (r) => {
+        const d = await r.json();
+        console.log('  - Local Ollama Inference (' + d.model + '): ' + r.status + ' OK');
+      }).catch((e) => {
+        console.error('  - Local Ollama API error:', e.message);
+        process.exit(1);
+      });
+    "
     echo "============================================================"
     echo " All containers and workspace applications are active!"
     echo "============================================================"
