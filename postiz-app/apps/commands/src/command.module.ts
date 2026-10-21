@@ -5,9 +5,15 @@ import { RefreshTokens } from './tasks/refresh.tokens';
 import { ConfigurationTask } from './tasks/configuration';
 import { AgentRun } from './tasks/agent.run';
 import { AgentModule } from '@gitroom/nestjs-libraries/agent/agent.module';
+import { getTemporalModule } from '@gitroom/nestjs-libraries/temporal/temporal.module';
 
 @Module({
-  imports: [ExternalCommandModule, DatabaseModule, AgentModule],
+  imports: [
+    ExternalCommandModule,
+    DatabaseModule,
+    AgentModule,
+    getTemporalModule(false),
+  ],
   controllers: [],
   providers: [RefreshTokens, ConfigurationTask, AgentRun],
   get exports() {

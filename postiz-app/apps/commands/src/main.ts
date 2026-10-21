@@ -11,6 +11,7 @@ async function bootstrap() {
   try {
     await app.select(CommandModule).get(CommandService).exec();
     await app.close();
+    process.exit(0);
   } catch (error) {
     console.error(error);
     await app.close();
