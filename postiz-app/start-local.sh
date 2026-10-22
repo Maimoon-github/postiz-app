@@ -63,7 +63,18 @@ case "$MODE" in
         cd /app/apps/backend && pm2 start pnpm --name backend -- start && cd /app
         cd /app/apps/orchestrator && pm2 start pnpm --name orchestrator -- start && cd /app
         touch /app/.ollama-synced
+      elif ! curl -sS http://localhost:3000/auth/can-register >/dev/null 2>&1; then
+        echo '  -> Restarting backend & orchestrator after Temporal readiness...'
+        pm2 restart backend orchestrator
       fi
+
+      # Wait for backend to listen on :3000
+      for i in \$(seq 1 30); do
+        if curl -sS http://localhost:3000/auth/can-register >/dev/null 2>&1; then
+          break
+        fi
+        sleep 1
+      done
 
       # 1. Build @postiz/node SDK (apps/sdk)
       if [ ! -f /app/apps/sdk/dist/index.js ]; then
@@ -94,7 +105,7 @@ case "$MODE" in
     echo "[5/5] Verifying live HTTP endpoints across the stack..."
     sleep 3
     curl -sS -o /dev/null -w "  - Postiz Frontend (Nginx :4007 -> :4200):   %{http_code}\n" http://localhost:4007/auth
-    curl -sS -o /dev/null -w "  - Postiz Backend API (Nginx :4007/api):     %{http_code}\n" http://localhost:4007/api/user/self
+    curl -sS -o /dev/null -w "  - Postiz Backend API (Nginx :4007/api):     %{http_code}\n" http://localhost:4007/api/auth/can-register
     curl -sS -o /dev/null -w "  - Postiz Orchestrator Health (:3002):       %{http_code}\n" http://localhost:3002/health/status
     curl -sS -o /dev/null -w "  - Temporal Web UI (:8082):                  %{http_code}\n" http://localhost:8082/
     curl -sS -o /dev/null -w "  - pgAdmin 4 UI (:8085):                     %{http_code}\n" http://localhost:8085/login
