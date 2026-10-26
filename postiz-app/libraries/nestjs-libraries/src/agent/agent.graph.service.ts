@@ -25,7 +25,8 @@ const toolNode = new ToolNode(tools);
 const model = new ChatOpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'ollama',
   model: process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M',
-  temperature: 0.7,
+  temperature: parseFloat(process.env.OLLAMA_TEMPERATURE || '0.7'),
+  maxTokens: parseInt(process.env.OLLAMA_MAX_TOKENS || '8192', 10),
   configuration: {
     baseURL:
       process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',

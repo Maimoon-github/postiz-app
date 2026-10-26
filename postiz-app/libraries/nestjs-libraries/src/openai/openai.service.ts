@@ -9,6 +9,10 @@ const openai = new OpenAI({
   baseURL: process.env.OPENAI_BASE_URL || 'http://host.docker.internal:11435/v1',
 });
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M';
+const OLLAMA_FAST_MODEL = process.env.OLLAMA_FAST_MODEL || 'qwen3.5:9b-q4_K_M';
+const OLLAMA_MAX_TOKENS = parseInt(process.env.OLLAMA_MAX_TOKENS || '8192', 10);
+const OLLAMA_TEMPERATURE = parseFloat(process.env.OLLAMA_TEMPERATURE || '0.7');
+const OLLAMA_CONTEXT_WINDOW = parseInt(process.env.OLLAMA_CONTEXT_WINDOW || '32768', 10);
 
 const PicturePrompt = z.object({
   prompt: z.string(),
@@ -357,8 +361,8 @@ Clips must not overlap. Write the title and the post in this language, whatever 
             content: `Title: ${title}\nContent:\n${content.slice(0, 4000)}`,
           },
         ],
-        temperature: 0,
-        max_tokens: 100,
+        temperature: OLLAMA_TEMPERATURE,
+        max_tokens: OLLAMA_MAX_TOKENS,
       });
       return (
         completion.choices[0]?.message?.content?.trim() ||

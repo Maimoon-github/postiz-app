@@ -41,8 +41,11 @@ services:
       OPENAI_API_KEY: 'ollama'
       OPENAI_BASE_URL: 'http://host.docker.internal:11435/v1'
       OLLAMA_MODEL: 'qwen3.5:9b-q4_K_M'
-      OLLAMA_FAST_MODEL: 'qwen3.5:4b-q4_K_M'
+      OLLAMA_FAST_MODEL: 'qwen3.5:9b-q4_K_M'
       OLLAMA_VISION_MODEL: 'qwen3-vl:8b-thinking-q4_K_M'
+      OLLAMA_CONTEXT_WINDOW: '32768'
+      OLLAMA_MAX_TOKENS: '8192'
+      OLLAMA_TEMPERATURE: '0.7'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:

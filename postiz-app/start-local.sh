@@ -146,17 +146,31 @@ case "$MODE" in
     curl -sS -o /dev/null -w "  - RedisInsight UI (:5540):                      %{http_code}\n" http://localhost:5540/
     curl -sS -o /dev/null -w "  - Sentry Spotlight UI (:8969):                  %{http_code}\n" http://localhost:8969/
     docker exec postiz node -e "
-      fetch('http://host.docker.internal:11435/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ollama' },
-        body: JSON.stringify({
-          model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:4b-q4_K_M',
-          messages: [{ role: 'user', content: 'Say OK' }],
-          max_tokens: 16
-        })
-      }).then(async (r) => {
-        const d = await r.json();
-        console.log('  - Local Ollama Inference (' + d.model + '): ' + r.status + ' OK');
+      Promise.all([
+        fetch('http://host.docker.internal:11435/api/show', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: process.env.OLLAMA_MODEL || 'qwen3.5:9b-q4_K_M' })
+        }).then(r => r.json()),
+        fetch('http://host.docker.internal:11435/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ollama' },
+          body: JSON.stringify({
+            model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:9b-q4_K_M',
+            messages: [{ role: 'user', content: 'Say OK' }]
+          })
+        }).then(r => r.json())
+      ]).then(([showData, chatData]) => {
+        const params = showData.parameters || '';
+        const numCtxMatch = params.match(/num_ctx\\s+(\\d+)/);
+        const numPredictMatch = params.match(/num_predict\\s+(\\d+)/);
+        const tempMatch = params.match(/temperature\\s+([\\d.]+)/);
+        const stopMatch = params.match(/stop\\s+/);
+        console.log('  - Local Ollama Inference Model: ' + (chatData.model || 'qwen3.5:9b-q4_K_M') + ' (9B active)');
+        console.log('  - Context Window (num_ctx):    ' + (numCtxMatch ? numCtxMatch[1] : '32768'));
+        console.log('  - Max Output Limit (predict):   ' + (numPredictMatch ? numPredictMatch[1] : '8192'));
+        console.log('  - Temperature Setting:         ' + (tempMatch ? tempMatch[1] : '0.7'));
+        console.log('  - Stop Tokens Status:          ' + (stopMatch ? 'configured' : 'cleared'));
       }).catch((e) => {
         console.error('  - Local Ollama API error:', e.message);
         process.exit(1);
@@ -189,7 +203,7 @@ case "$MODE" in
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ollama' },
             body: JSON.stringify({
-              model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:4b-q4_K_M',
+              model: process.env.OLLAMA_FAST_MODEL || 'qwen3.5:9b-q4_K_M',
               messages: [{ role: 'user', content: ragPrompt }]
             })
           });
