@@ -20,8 +20,10 @@ import { DeletePostTool } from '@gitroom/nestjs-libraries/chat/tools/delete.post
 import { UploadWidgetTool } from '@gitroom/nestjs-libraries/chat/tools/upload.widget.tool';
 import { UploadWidgetTicketTool } from '@gitroom/nestjs-libraries/chat/tools/upload.widget.ticket.tool';
 import { UploadWidgetStatusTool } from '@gitroom/nestjs-libraries/chat/tools/upload.widget.status.tool';
+import { KnowledgeRetrieveTool } from '@gitroom/nestjs-libraries/chat/tools/knowledge.retrieve.tool';
 
 export const toolList = [
+  KnowledgeRetrieveTool,
   IntegrationListTool,
   GroupListTool,
   IntegrationValidationTool,

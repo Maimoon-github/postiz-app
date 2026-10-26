@@ -45,6 +45,7 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  knowledge           KnowledgeResource[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -1838,4 +1839,39 @@ model Announcement {
   description String
   color       AnnouncementColor @default(INFO)
   createdAt   DateTime          @default(now())
+}
+
+model KnowledgeResource {
+  id                 String           @id @default(uuid())
+  organizationId     String
+  title              String
+  content            String           @db.Text
+  summary            String?          @db.Text
+  status             String           @default("DRAFT") // DRAFT | PUBLISHED
+  version            Int              @default(1)
+  contentHash        String
+  channelIdentifiers String[]         @default([])
+  tags               String[]         @default([])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  chunks             KnowledgeChunk[]
+
+  @@index([organizationId, status])
+  @@index([organizationId])
+}
+
+model KnowledgeChunk {
+  id             String            @id @default(uuid())
+  resourceId     String
+  organizationId String
+  chunkIndex     Int
+  version        Int
+  contextualText String            @db.Text
+  embedding      Float[]
+  createdAt      DateTime          @default(now())
+  resource       KnowledgeResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, resourceId, version])
+  @@index([organizationId, version])
 }

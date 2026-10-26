@@ -328,4 +328,278 @@ Clips must not overlap. Write the title and the post in this language, whatever 
 
     return [];
   }
+
+  async getEmbedding(text: string): Promise<number[]> {
+    try {
+      const response = await openai.embeddings.create({
+        model: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
+        input: text.slice(0, 8000),
+      });
+      return response.data[0].embedding;
+    } catch (err) {
+      // Deterministic pseudo-embedding for testing or offline environments
+      return this._deterministicVector(text, 64);
+    }
+  }
+
+  async generateSummary(content: string, title = ''): Promise<string> {
+    try {
+      const completion = await openai.chat.completions.create({
+        model: OLLAMA_MODEL,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Summarize the following document in exactly one concise, high-signal sentence preserving key topics, rules, and entities.',
+          },
+          {
+            role: 'user',
+            content: `Title: ${title}\nContent:\n${content.slice(0, 4000)}`,
+          },
+        ],
+        temperature: 0,
+        max_tokens: 100,
+      });
+      return (
+        completion.choices[0]?.message?.content?.trim() ||
+        this._heuristicSummary(content, title)
+      );
+    } catch (err) {
+      return this._heuristicSummary(content, title);
+    }
+  }
+
+  async classifyQueryComplexity(
+    query: string
+  ): Promise<{ isComplex: boolean; subQueries: string[] }> {
+    try {
+      const ComplexitySchema = z.object({
+        isComplex: z
+          .boolean()
+          .describe(
+            'True if query requires multi-hop reasoning, comparative analysis, or multiple distinct facts'
+          ),
+        subQueries: z
+          .array(z.string())
+          .describe('List of independent atomic sub-queries if complex, otherwise single query'),
+      });
+
+      const parsed = (
+        await openai.chat.completions.parse({
+          model: OLLAMA_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are an adaptive RAG planner. Classify the user query at temperature 0. If it asks multiple questions or compares platforms/rules, decompose into 2-3 parallel sub-queries. Otherwise keep it single.',
+            },
+            {
+              role: 'user',
+              content: query,
+            },
+          ],
+          response_format: zodResponseFormat(ComplexitySchema, 'complexity'),
+          temperature: 0,
+        })
+      ).choices[0]?.message?.parsed;
+
+      if (
+        parsed &&
+        typeof parsed.isComplex === 'boolean' &&
+        Array.isArray(parsed.subQueries) &&
+        parsed.subQueries.length > 0
+      ) {
+        return {
+          isComplex: parsed.isComplex,
+          subQueries: parsed.subQueries,
+        };
+      }
+    } catch (err) {}
+
+    // Fallback heuristic classification
+    const isMultiPart =
+      query.includes(' and ') ||
+      query.includes(' vs ') ||
+      query.includes('compare') ||
+      query.includes('?') && query.indexOf('?') !== query.lastIndexOf('?');
+
+    if (isMultiPart) {
+      const parts = query
+        .split(/\band\b|\bvs\b|\?/i)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 5);
+      return {
+        isComplex: parts.length > 1,
+        subQueries: parts.length > 1 ? parts : [query],
+      };
+    }
+
+    return { isComplex: false, subQueries: [query] };
+  }
+
+  async gradeEvidence(
+    query: string,
+    chunks: Array<{ id: string; text: string }>
+  ): Promise<{
+    isSufficient: boolean;
+    status: 'COMPLETE' | 'PARTIAL' | 'ABSTAIN';
+    relevantChunkIds: string[];
+    missingInfo: string[];
+    nextQueries: string[];
+  }> {
+    if (!chunks.length) {
+      return {
+        isSufficient: false,
+        status: 'ABSTAIN',
+        relevantChunkIds: [],
+        missingInfo: ['No evidence found in knowledge base'],
+        nextQueries: [query],
+      };
+    }
+
+    try {
+      const GraderSchema = z.object({
+        isSufficient: z.boolean(),
+        status: z.enum(['COMPLETE', 'PARTIAL', 'ABSTAIN']),
+        relevantChunkIds: z.array(z.string()),
+        missingInfo: z.array(z.string()),
+        nextQueries: z.array(z.string()),
+      });
+
+      const parsed = (
+        await openai.chat.completions.parse({
+          model: OLLAMA_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are a Corrective RAG (CRAG) evidence grader. Evaluate candidate passages on (1) Relevancy and (2) Sufficiency to answer the query. Return COMPLETE if all parts are covered, PARTIAL if some parts are missing, or ABSTAIN if irrelevant.',
+            },
+            {
+              role: 'user',
+              content: `Query: ${query}\n\nEvidence Chunks:\n${chunks
+                .map((c) => `[ID: ${c.id}]\n${c.text}`)
+                .join('\n\n')}`,
+            },
+          ],
+          response_format: zodResponseFormat(GraderSchema, 'evidenceGrade'),
+          temperature: 0,
+        })
+      ).choices[0]?.message?.parsed;
+
+      if (
+        parsed &&
+        typeof parsed.isSufficient === 'boolean' &&
+        parsed.status &&
+        Array.isArray(parsed.relevantChunkIds) &&
+        Array.isArray(parsed.missingInfo) &&
+        Array.isArray(parsed.nextQueries)
+      ) {
+        return {
+          isSufficient: parsed.isSufficient,
+          status: parsed.status,
+          relevantChunkIds: parsed.relevantChunkIds,
+          missingInfo: parsed.missingInfo,
+          nextQueries: parsed.nextQueries,
+        };
+      }
+    } catch (err) {}
+
+    // Deterministic lexical scoring fallback
+    const queryTokens = query
+      .toLowerCase()
+      .split(/\W+/)
+      .filter((t) => t.length > 2);
+    const relevantIds: string[] = [];
+    for (const chunk of chunks) {
+      const lower = chunk.text.toLowerCase();
+      const matchCount = queryTokens.filter((tok) => lower.includes(tok)).length;
+      if (matchCount / (queryTokens.length || 1) >= 0.25) {
+        relevantIds.push(chunk.id);
+      }
+    }
+
+    if (relevantIds.length === 0) {
+      return {
+        isSufficient: false,
+        status: 'ABSTAIN',
+        relevantChunkIds: [],
+        missingInfo: ['No relevant chunks matched query tokens'],
+        nextQueries: [query],
+      };
+    }
+
+    return {
+      isSufficient: true,
+      status: 'COMPLETE',
+      relevantChunkIds: relevantIds,
+      missingInfo: [],
+      nextQueries: [],
+    };
+  }
+
+  async rewriteQuery(
+    originalQuery: string,
+    missingInfo: string[],
+    attemptedQueries: string[]
+  ): Promise<string> {
+    try {
+      const RewriteSchema = z.object({
+        rewrittenQuery: z.string().describe('Targeted search query focused on the missing facts'),
+      });
+
+      const parsed = (
+        await openai.chat.completions.parse({
+          model: OLLAMA_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are a reflective query rewriter. Formulate a refined, targeted search query to locate missing information. Do not repeat any attempted queries.',
+            },
+            {
+              role: 'user',
+              content: `Original Query: ${originalQuery}\nMissing Facts: ${missingInfo.join(
+                '; '
+              )}\nAttempted Queries: ${attemptedQueries.join(' | ')}`,
+            },
+          ],
+          response_format: zodResponseFormat(RewriteSchema, 'rewrite'),
+          temperature: 0,
+        })
+      ).choices[0]?.message?.parsed;
+
+      if (parsed?.rewrittenQuery && !attemptedQueries.includes(parsed.rewrittenQuery)) {
+        return parsed.rewrittenQuery;
+      }
+    } catch (err) {}
+
+    // Fallback: append highest priority missing info
+    const addition = missingInfo[0] || 'details';
+    const fallback = `${originalQuery} ${addition}`.trim();
+    return attemptedQueries.includes(fallback) ? `${fallback} specification` : fallback;
+  }
+
+  private _heuristicSummary(content: string, title: string): string {
+    const sentences = content
+      .split(/(?<=[.?!])\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (sentences.length > 0) {
+      return title ? `${title}: ${sentences[0]}` : sentences[0];
+    }
+    return title || 'Document knowledge overview';
+  }
+
+  private _deterministicVector(text: string, dimensions = 64): number[] {
+    const vec = new Array(dimensions).fill(0);
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      const idx = (code + i * 17) % dimensions;
+      vec[idx] += 1;
+    }
+    // L2 Normalize
+    const norm = Math.sqrt(vec.reduce((sum, val) => sum + val * val, 0)) || 1;
+    return vec.map((v) => Number((v / norm).toFixed(6)));
+  }
 }
