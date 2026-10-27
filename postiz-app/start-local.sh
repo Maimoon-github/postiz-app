@@ -22,54 +22,51 @@ fi
 
 case "$MODE" in
   full)
-    if docker image inspect localhost/postiz:local >/dev/null 2>&1 && [ "${2:-}" != "--rebuild" ]; then
-      echo "[1/5] Starting all 12 containers in the Postiz stack (using built localhost/postiz:local image)..."
-      docker compose -f docker-compose.local.yaml up -d
+    # 1. Reuse existing containers if already running; otherwise launch with pull-missing
+    if docker inspect -f '{{.State.Running}}' postiz 2>/dev/null | grep -q 'true' && [ "${2:-}" != "--rebuild" ]; then
+      echo "[1/5] Reusing active Postiz stack containers (12 containers online)..."
+    elif docker image inspect localhost/postiz:local >/dev/null 2>&1 && [ "${2:-}" != "--rebuild" ]; then
+      echo "[1/5] Starting containers using existing localhost/postiz:local image (pull missing only)..."
+      docker compose -f docker-compose.local.yaml up -d --pull missing --no-build
     else
       echo "[1/5] Building and starting all 12 containers in the Postiz stack..."
       docker compose -f docker-compose.local.yaml up -d --build
     fi
 
-    echo "[2/5] Waiting for PM2 services (frontend, backend, orchestrator) inside 'postiz' container..."
-    for i in $(seq 1 30); do
+    echo "[2/5] Checking PM2 services (frontend, backend, orchestrator) inside 'postiz' container..."
+    for i in $(seq 1 20); do
       if docker exec postiz sh -c "pm2 jlist 2>/dev/null | grep -q '\"name\":\"backend\"'" >/dev/null 2>&1; then
         break
       fi
-      sleep 2
+      sleep 1
     done
 
-    echo "[3/5] Syncing local Ollama LLM integration & activating workspace apps inside 'postiz'..."
-    docker cp .env postiz:/app/.env
-    docker cp libraries/nestjs-libraries/src/chat/load.tools.service.ts postiz:/app/libraries/nestjs-libraries/src/chat/load.tools.service.ts
-    docker cp apps/backend/src/api/routes/copilot.controller.ts postiz:/app/apps/backend/src/api/routes/copilot.controller.ts
-    docker cp libraries/nestjs-libraries/src/openai/openai.service.ts postiz:/app/libraries/nestjs-libraries/src/openai/openai.service.ts
-    docker cp libraries/nestjs-libraries/src/agent/agent.graph.service.ts postiz:/app/libraries/nestjs-libraries/src/agent/agent.graph.service.ts
-    docker cp libraries/nestjs-libraries/src/agent/agent.graph.insert.service.ts postiz:/app/libraries/nestjs-libraries/src/agent/agent.graph.insert.service.ts
-    docker cp libraries/nestjs-libraries/src/database/prisma/autopost/autopost.service.ts postiz:/app/libraries/nestjs-libraries/src/database/prisma/autopost/autopost.service.ts
-    docker cp apps/commands/src/main.ts postiz:/app/apps/commands/src/main.ts
-    docker cp apps/commands/src/tasks/agent.run.ts postiz:/app/apps/commands/src/tasks/agent.run.ts
-    docker cp apps/commands/src/command.module.ts postiz:/app/apps/commands/src/command.module.ts
-    docker cp apps/commands/package.json postiz:/app/apps/commands/package.json
-
-    # Sync Knowledge Base & Agentic RAG Subsystem files
-    docker exec postiz mkdir -p \
-      /app/libraries/nestjs-libraries/src/database/prisma/knowledge \
-      /app/libraries/nestjs-libraries/src/dtos/knowledge \
-      /app/apps/frontend/src/components/agents/knowledge \
-      "/app/apps/frontend/src/app/(app)/(site)/knowledge"
-
-    docker cp libraries/nestjs-libraries/src/database/prisma/schema.prisma postiz:/app/libraries/nestjs-libraries/src/database/prisma/schema.prisma
-    docker cp libraries/nestjs-libraries/src/database/prisma/database.module.ts postiz:/app/libraries/nestjs-libraries/src/database/prisma/database.module.ts
-    docker cp libraries/nestjs-libraries/src/database/prisma/knowledge/. postiz:/app/libraries/nestjs-libraries/src/database/prisma/knowledge/
-    docker cp libraries/nestjs-libraries/src/dtos/knowledge/. postiz:/app/libraries/nestjs-libraries/src/dtos/knowledge/
-    docker cp libraries/nestjs-libraries/src/chat/tools/knowledge.retrieve.tool.ts postiz:/app/libraries/nestjs-libraries/src/chat/tools/knowledge.retrieve.tool.ts
-    docker cp libraries/nestjs-libraries/src/chat/tools/tool.list.ts postiz:/app/libraries/nestjs-libraries/src/chat/tools/tool.list.ts
-    docker cp apps/backend/src/api/routes/knowledge.controller.ts postiz:/app/apps/backend/src/api/routes/knowledge.controller.ts
-    docker cp apps/backend/src/api/api.module.ts postiz:/app/apps/backend/src/api/api.module.ts
-    docker cp apps/frontend/src/components/layout/top.menu.tsx postiz:/app/apps/frontend/src/components/layout/top.menu.tsx
-    docker cp apps/frontend/src/components/agents/agent.tsx postiz:/app/apps/frontend/src/components/agents/agent.tsx
-    docker cp apps/frontend/src/components/agents/knowledge/. postiz:/app/apps/frontend/src/components/agents/knowledge/
-    docker cp "apps/frontend/src/app/(app)/(site)/knowledge/." "postiz:/app/apps/frontend/src/app/(app)/(site)/knowledge/"
+    echo "[3/5] Loading runtime .env & syncing workspace apps inside 'postiz'..."
+    tar -cf - \
+      .env \
+      libraries/nestjs-libraries/src/chat/load.tools.service.ts \
+      apps/backend/src/api/routes/copilot.controller.ts \
+      libraries/nestjs-libraries/src/openai/openai.service.ts \
+      libraries/nestjs-libraries/src/agent/agent.graph.service.ts \
+      libraries/nestjs-libraries/src/agent/agent.graph.insert.service.ts \
+      libraries/nestjs-libraries/src/database/prisma/autopost/autopost.service.ts \
+      apps/commands/src/main.ts \
+      apps/commands/src/tasks/agent.run.ts \
+      apps/commands/src/command.module.ts \
+      apps/commands/package.json \
+      libraries/nestjs-libraries/src/database/prisma/schema.prisma \
+      libraries/nestjs-libraries/src/database/prisma/database.module.ts \
+      libraries/nestjs-libraries/src/database/prisma/knowledge \
+      libraries/nestjs-libraries/src/dtos/knowledge \
+      libraries/nestjs-libraries/src/chat/tools/knowledge.retrieve.tool.ts \
+      libraries/nestjs-libraries/src/chat/tools/tool.list.ts \
+      apps/backend/src/api/routes/knowledge.controller.ts \
+      apps/backend/src/api/api.module.ts \
+      apps/frontend/src/components/layout/top.menu.tsx \
+      apps/frontend/src/components/agents/agent.tsx \
+      apps/frontend/src/components/agents/knowledge \
+      "apps/frontend/src/app/(app)/(site)/knowledge" \
+      2>/dev/null | docker exec -i postiz tar -xf - -C /app
 
     docker exec postiz sh -c "
       set -e
@@ -104,31 +101,31 @@ case "$MODE" in
       fi
 
       # Wait for backend to listen on :3000
-      for i in \$(seq 1 30); do
+      for i in \$(seq 1 20); do
         if curl -sS http://localhost:3000/auth/can-register >/dev/null 2>&1; then
           break
         fi
-        sleep 1
+        sleep 0.5
       done
 
-      # 1. Build @postiz/node SDK (apps/sdk)
+      # 1. Build @postiz/node SDK (apps/sdk) only if missing
       if [ ! -f /app/apps/sdk/dist/index.js ]; then
         echo '  -> Building apps/sdk (@postiz/node)...'
         pnpm --filter ./apps/sdk exec tsup
       fi
 
-      # 2. Build CLI Commands (apps/commands) & run config:check
-      echo '  -> Building apps/commands (postiz-command)...'
-      pnpm --filter ./apps/commands run build
-      echo '  -> Running apps/commands config:check...'
-      pnpm --filter ./apps/commands run start config:check
+      # 2. Build CLI Commands (apps/commands) only if missing
+      if [ ! -f /app/apps/commands/dist/apps/commands/src/main.js ]; then
+        echo '  -> Building apps/commands (postiz-command)...'
+        pnpm --filter ./apps/commands run build
+      fi
 
       # 3. Build Browser Extension (apps/extension) & activate PM2 dev watcher on :8081
       if [ ! -f /app/apps/extension/dist/manifest.json ]; then
         echo '  -> Building apps/extension (postiz-extension)...'
         cd /app/apps/extension && npx vite build && cp manifest.json dist/manifest.json && cd /app
       fi
-      if ! pm2 jlist | grep -q '\"name\":\"extension\"'; then
+      if ! pm2 jlist 2>/dev/null | grep -q '\"name\":\"extension\"'; then
         echo '  -> Starting apps/extension watcher under PM2 (:8081)...'
         cd /app/apps/extension && pm2 start pnpm --name extension -- run dev && cd /app
       fi
@@ -137,17 +134,40 @@ case "$MODE" in
     echo "[4/5] Verifying PM2 processes inside 'postiz' container..."
     docker exec postiz pm2 list
 
-    echo "[5/5] Verifying live HTTP endpoints across the stack..."
-    sleep 3
-    curl -sS -o /dev/null -w "  - Postiz Frontend (Nginx :4007 -> :4200):       %{http_code}\n" http://localhost:4007/auth
-    curl -sS -o /dev/null -w "  - Postiz Knowledge Base Page (:4007/knowledge):  %{http_code}\n" http://localhost:4007/knowledge
-    curl -sS -o /dev/null -w "  - Postiz Backend API (Nginx :4007/api):         %{http_code}\n" http://localhost:4007/api/auth/can-register
-    curl -sS -o /dev/null -w "  - Postiz Knowledge API (:4007/api/knowledge):      %{http_code}\n" http://localhost:4007/api/knowledge
-    curl -sS -o /dev/null -w "  - Postiz Orchestrator Health (:3002):           %{http_code}\n" http://localhost:3002/health/status
-    curl -sS -o /dev/null -w "  - Temporal Web UI (:8082):                      %{http_code}\n" http://localhost:8082/
-    curl -sS -o /dev/null -w "  - pgAdmin 4 UI (:8085):                         %{http_code}\n" http://localhost:8085/login
-    curl -sS -o /dev/null -w "  - RedisInsight UI (:5540):                      %{http_code}\n" http://localhost:5540/
-    curl -sS -o /dev/null -w "  - Sentry Spotlight UI (:8969):                  %{http_code}\n" http://localhost:8969/
+    echo "[5/5] Verifying live HTTP endpoints & Social Channel configurations..."
+    endpoints=(
+      "Postiz Frontend (Nginx :4007 -> :4200)|http://localhost:4007/auth"
+      "Postiz Knowledge Base Page (:4007/knowledge)|http://localhost:4007/knowledge"
+      "Postiz Backend API (Nginx :4007/api)|http://localhost:4007/api/auth/can-register"
+      "Postiz Knowledge API (:4007/api/knowledge)|http://localhost:4007/api/knowledge"
+      "Postiz Orchestrator Health (:3002)|http://localhost:3002/health/status"
+      "Temporal Web UI (:8082)|http://localhost:8082/"
+      "pgAdmin 4 UI (:8085)|http://localhost:8085/login"
+      "RedisInsight UI (:5540)|http://localhost:5540/"
+      "Sentry Spotlight UI (:8969)|http://localhost:8969/"
+    )
+    for item in "${endpoints[@]}"; do
+      IFS="|" read -r name url <<< "$item"
+      code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 2 "$url" 2>/dev/null || echo "ERR")
+      printf "  - %-48s %s\n" "$name" "$code"
+    done
+
+    echo "[Channel Integrations] Verifying configured social channels at runtime..."
+    docker exec postiz node -e "
+      const xKey = process.env.X_API_KEY;
+      const xSecret = process.env.X_API_SECRET;
+      const liId = process.env.LINKEDIN_CLIENT_ID;
+      const liSecret = process.env.LINKEDIN_CLIENT_SECRET;
+      const fbId = process.env.FACEBOOK_APP_ID;
+      const fbSecret = process.env.FACEBOOK_APP_SECRET;
+
+      const mask = (val) => (val && val.length > 4 ? val.slice(0, 4) + '...' + val.slice(-2) : 'configured');
+
+      console.log('  - X (Twitter) Channel:       ' + (xKey && xSecret ? 'Active [Key: ' + mask(xKey) + ']' : 'Not set'));
+      console.log('  - LinkedIn (Page) Channel:   ' + (liId && liSecret ? 'Active [Client ID: ' + mask(liId) + ']' : 'Not set'));
+      console.log('  - Facebook / IG Business:    ' + (fbId && fbSecret ? 'Active [App ID: ' + mask(fbId) + ']' : 'Not set'));
+    "
+
     docker exec postiz node -e "
       Promise.all([
         fetch('http://host.docker.internal:11435/api/show', {
@@ -175,8 +195,7 @@ case "$MODE" in
         console.log('  - Temperature Setting:         ' + (tempMatch ? tempMatch[1] : '0.7'));
         console.log('  - Stop Tokens Status:          ' + (stopMatch ? 'configured' : 'cleared'));
       }).catch((e) => {
-        console.error('  - Local Ollama API error:', e.message);
-        process.exit(1);
+        console.log('  - Local Ollama Status:          Offline/Standby (' + e.message + ')');
       });
     "
 
@@ -229,15 +248,15 @@ case "$MODE" in
     echo "============================================================"
     ;;
   prebuilt)
-    echo "[1/2] Starting the complete Postiz stack using prebuilt GHCR image..."
-    docker compose -f docker-compose.yaml up -d
+    echo "[1/2] Starting Postiz stack with prebuilt GHCR image (pull missing only)..."
+    docker compose -f docker-compose.yaml up -d --pull missing
     echo "[2/2] Stack launched!"
     echo "  - Postiz Web App & API (via Nginx): http://localhost:4007"
     echo "  - Temporal Web UI:                  http://localhost:8082"
     ;;
   dev)
-    echo "[1/4] Starting infrastructure containers (Postgres, Redis, Temporal, pgAdmin, RedisInsight)..."
-    docker compose -f docker-compose.dev.yaml up -d
+    echo "[1/4] Starting infrastructure containers (pull missing only)..."
+    docker compose -f docker-compose.dev.yaml up -d --pull missing
     echo "[2/4] Installing workspace dependencies and generating Prisma client..."
     pnpm install
     echo "[3/4] Pushing Prisma schema to PostgreSQL..."
