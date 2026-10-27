@@ -98,6 +98,9 @@ case "$MODE" in
       elif ! curl -sS http://localhost:3000/auth/can-register >/dev/null 2>&1; then
         echo '  -> Restarting backend & orchestrator after Temporal readiness...'
         pm2 restart backend orchestrator
+      else
+        echo '  -> Refreshing PM2 services with synced .env environment variables...'
+        pm2 restart backend orchestrator frontend --update-env
       fi
 
       # Wait for backend to listen on :3000
