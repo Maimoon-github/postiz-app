@@ -1,19 +1,30 @@
-File Tree: postiz-app
-Root path: /home/maimoon-amin/Antigravity code/postiz-app
+# File Tree: postiz-app
 
-────────────────────────────────────────────────────────────────────────────────
-
-└── 📁 postiz-app/
-    ├── 📁 .claude/
+```
+├── 📁 auth
+│   ├── 📕 Postiz_Social_Channel_Authentication_Guide.pdf
+│   ├── 📕 RAKA_LinkedIn_Page_Postiz_Authentication_Guide.pdf
+│   ├── 📕 RAKA_Meta_Postiz_Authentication_Guide.pdf
+│   ├── 📕 RAKA_Pinterest_Postiz_Authentication_Guide.pdf
+│   └── 📕 RAKA_X_Twitter_Postiz_Authentication_Guide.pdf
+├── 📁 markdown
+│   ├── 📝 Platform_API Info.md
+│   ├── 📝 Postiz Architecture Analysis Prompt.md
+│   ├── 📝 agentic_rag_specification_and_architecture (Task Plan).md
+│   ├── 📝 agentic_rag_specification_and_architecture.md
+│   ├── 📝 files in postiz-app — documentation, config, and data.md
+│   └── 📝 report.md
+└── 📁 postiz-app
+    ├── 📁 .claude
     │   └── ⚙️ settings.json
-    ├── 📁 .devcontainer/
+    ├── 📁 .devcontainer
     │   └── ⚙️ devcontainer.json
-    ├── 📁 .github/
-    │   ├── 📁 ISSUE_TEMPLATE/
+    ├── 📁 .github
+    │   ├── 📁 ISSUE_TEMPLATE
     │   │   ├── ⚙️ 01_bug_report.yml
     │   │   ├── ⚙️ 02_feature_request.yml
     │   │   └── ⚙️ config.yml
-    │   ├── 📁 agents/
+    │   ├── 📁 agents
     │   │   ├── 🖼️ ai-agents-cli.svg
     │   │   ├── 🖼️ chatgpt.svg
     │   │   ├── 🖼️ claude-code.svg
@@ -30,16 +41,16 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── 🖼️ openclaw.svg
     │   │   ├── 🖼️ paperclip.svg
     │   │   └── 🖼️ perplexity-computer.svg
-    │   ├── 📁 assets/
+    │   ├── 📁 assets
     │   │   ├── 🖼️ gitroom-darkmode-logo.png
     │   │   ├── 🖼️ gitroom-lightmode-logo.png
     │   │   ├── 🖼️ gitroom-main-youtube.png
     │   │   ├── 🖼️ screen-002.png
     │   │   ├── 🖼️ screen-003.png
     │   │   └── 🖼️ screen-004.png
-    │   ├── 📁 sponsors/
+    │   ├── 📁 sponsors
     │   │   └── 🖼️ hostinger.png
-    │   ├── 📁 workflows/
+    │   ├── 📁 workflows
     │   │   ├── ⚙️ build-containers.yml
     │   │   ├── ⚙️ build-extension.yaml
     │   │   ├── ⚙️ build.yml
@@ -53,14 +64,14 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   ├── ⚙️ FUNDING.yaml
     │   ├── 📝 PULL_REQUEST_TEMPLATE.md
     │   └── 📝 copilot-instructions.md
-    ├── 📁 Jenkins/
+    ├── 📁 Jenkins
     │   ├── 📄 Build.Jenkinsfile
     │   └── 📄 BuildPR.Jenkinsfile
-    ├── 📁 apps/
-    │   ├── 📁 backend/
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 api/
-    │   │   │   │   ├── 📁 routes/
+    ├── 📁 apps
+    │   ├── 📁 backend
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 api
+    │   │   │   │   ├── 📁 routes
     │   │   │   │   │   ├── 📄 admin.controller.ts
     │   │   │   │   │   ├── 📄 analytics.controller.ts
     │   │   │   │   │   ├── 📄 announcements.controller.ts
@@ -73,6 +84,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 copilot.controller.ts
     │   │   │   │   │   ├── 📄 enterprise.controller.ts
     │   │   │   │   │   ├── 📄 integrations.controller.ts
+    │   │   │   │   │   ├── 📄 knowledge.controller.ts
     │   │   │   │   │   ├── 📄 media.controller.ts
     │   │   │   │   │   ├── 📄 media.widget.controller.ts
     │   │   │   │   │   ├── 📄 monitor.controller.ts
@@ -93,22 +105,22 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 users.controller.ts
     │   │   │   │   │   └── 📄 webhooks.controller.ts
     │   │   │   │   └── 📄 api.module.ts
-    │   │   │   ├── 📁 assets/
+    │   │   │   ├── 📁 assets
     │   │   │   │   └── ⚙️ .gitkeep
-    │   │   │   ├── 📁 public-api/
-    │   │   │   │   ├── 📁 routes/
-    │   │   │   │   │   └── 📁 v1/
+    │   │   │   ├── 📁 public-api
+    │   │   │   │   ├── 📁 routes
+    │   │   │   │   │   └── 📁 v1
     │   │   │   │   │       └── 📄 public.integrations.controller.ts
     │   │   │   │   └── 📄 public.api.module.ts
-    │   │   │   ├── 📁 services/
-    │   │   │   │   └── 📁 auth/
-    │   │   │   │       ├── 📁 permissions/
+    │   │   │   ├── 📁 services
+    │   │   │   │   └── 📁 auth
+    │   │   │   │       ├── 📁 permissions
     │   │   │   │       │   ├── 📄 permission.exception.class.ts
     │   │   │   │       │   ├── 📄 permissions.ability.ts
     │   │   │   │       │   ├── 📄 permissions.guard.ts
     │   │   │   │       │   ├── 📄 permissions.service.ts
     │   │   │   │       │   └── 📄 subscription.exception.ts
-    │   │   │   │       ├── 📁 providers/
+    │   │   │   │       ├── 📁 providers
     │   │   │   │       │   ├── 📄 apple.provider.ts
     │   │   │   │       │   ├── 📄 farcaster.provider.ts
     │   │   │   │       │   ├── 📄 github.provider.ts
@@ -129,9 +141,9 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── ⚙️ nest-cli.json
     │   │   ├── ⚙️ package.json
     │   │   └── ⚙️ tsconfig.json
-    │   ├── 📁 commands/
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 tasks/
+    │   ├── 📁 commands
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 tasks
     │   │   │   │   ├── 📄 agent.run.ts
     │   │   │   │   ├── 📄 configuration.ts
     │   │   │   │   └── 📄 refresh.tokens.ts
@@ -141,17 +153,17 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── ⚙️ nest-cli.json
     │   │   ├── ⚙️ package.json
     │   │   └── ⚙️ tsconfig.json
-    │   ├── 📁 extension/
-    │   │   ├── 📁 public/
+    │   ├── 📁 extension
+    │   │   ├── 📁 public
     │   │   │   ├── 🖼️ icon-128.png
     │   │   │   └── 🖼️ icon-32.png
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 providers/
-    │   │   │   │   ├── 📁 list/
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 providers
+    │   │   │   │   ├── 📁 list
     │   │   │   │   │   └── 📄 skool.provider.ts
     │   │   │   │   ├── 📄 cookie-provider.interface.ts
     │   │   │   │   └── 📄 provider.registry.ts
-    │   │   │   ├── 📁 types/
+    │   │   │   ├── 📁 types
     │   │   │   │   └── 📄 messages.ts
     │   │   │   └── 📄 background.ts
     │   │   ├── ⚙️ .gitignore
@@ -163,10 +175,10 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── 📄 vite.config.base.ts
     │   │   ├── 📄 vite.config.chrome.ts
     │   │   └── 📄 vite.config.ts
-    │   ├── 📁 frontend/
-    │   │   ├── 📁 public/
-    │   │   │   ├── 📁 auth/
-    │   │   │   │   ├── 📁 avatars/
+    │   ├── 📁 frontend
+    │   │   ├── 📁 public
+    │   │   │   ├── 📁 auth
+    │   │   │   │   ├── 📁 avatars
     │   │   │   │   │   ├── 🖼️ ali.jpg
     │   │   │   │   │   ├── 🖼️ andy.jpeg
     │   │   │   │   │   ├── 🖼️ anica.jpg
@@ -186,10 +198,10 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   └── 🖼️ vincent.jpg
     │   │   │   │   ├── 🖼️ bg-login.png
     │   │   │   │   └── 🖼️ login-box.png
-    │   │   │   ├── 📁 form/
+    │   │   │   ├── 📁 form
     │   │   │   │   └── 🖼️ checked.svg
-    │   │   │   ├── 📁 icons/
-    │   │   │   │   ├── 📁 platforms/
+    │   │   │   ├── 📁 icons
+    │   │   │   │   ├── 📁 platforms
     │   │   │   │   │   ├── 🖼️ bluesky.png
     │   │   │   │   │   ├── 🖼️ devto.png
     │   │   │   │   │   ├── 🖼️ discord.png
@@ -227,7 +239,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 🖼️ x.png
     │   │   │   │   │   ├── 🖼️ youtube.png
     │   │   │   │   │   └── 🖼️ youtube.svg
-    │   │   │   │   ├── 📁 third-party/
+    │   │   │   │   ├── 📁 third-party
     │   │   │   │   │   ├── 🖼️ heygen.png
     │   │   │   │   │   ├── 🖼️ hubspot.png
     │   │   │   │   │   ├── 🖼️ nanoclaw.png
@@ -253,117 +265,123 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   ├── 🖼️ postiz.svg
     │   │   │   ├── 🖼️ stripe.svg
     │   │   │   └── 🖼️ success.svg
-    │   │   ├── 📁 scripts/
+    │   │   ├── 📁 scripts
     │   │   │   └── 📄 fetch-gtm.mjs
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 app/
-    │   │   │   │   ├── 📁 (app)/
-    │   │   │   │   │   ├── 📁 (preview)/
-    │   │   │   │   │   │   └── 📁 p/
-    │   │   │   │   │   │       └── 📁 [id]/
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 app
+    │   │   │   │   ├── 📁 (app)
+    │   │   │   │   │   ├── 📁 (preview)
+    │   │   │   │   │   │   └── 📁 p
+    │   │   │   │   │   │       └── 📁 [id]
     │   │   │   │   │   │           ├── 📄 layout.tsx
     │   │   │   │   │   │           └── 📄 page.tsx
-    │   │   │   │   │   ├── 📁 (site)/
-    │   │   │   │   │   │   ├── 📁 admin/
-    │   │   │   │   │   │   │   ├── 📁 errors/
+    │   │   │   │   │   ├── 📁 (site)
+    │   │   │   │   │   │   ├── 📁 admin
+    │   │   │   │   │   │   │   ├── 📁 errors
     │   │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   │   └── 📁 stats/
+    │   │   │   │   │   │   │   └── 📁 stats
     │   │   │   │   │   │   │       └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 agents/
-    │   │   │   │   │   │   │   ├── 📁 [id]/
+    │   │   │   │   │   │   ├── 📁 agents
+    │   │   │   │   │   │   │   ├── 📁 [id]
     │   │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   │   ├── 📄 layout.tsx
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 analytics/
+    │   │   │   │   │   │   ├── 📁 analytics
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 billing/
-    │   │   │   │   │   │   │   ├── 📁 lifetime/
+    │   │   │   │   │   │   ├── 📁 billing
+    │   │   │   │   │   │   │   ├── 📁 lifetime
     │   │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 err/
+    │   │   │   │   │   │   ├── 📁 err
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 launches/
+    │   │   │   │   │   │   ├── 📁 knowledge
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 media/
+    │   │   │   │   │   │   ├── 📁 launches
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 plugs/
+    │   │   │   │   │   │   ├── 📁 media
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 settings/
+    │   │   │   │   │   │   ├── 📁 plugs
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 third-party/
+    │   │   │   │   │   │   ├── 📁 settings
+    │   │   │   │   │   │   │   └── 📄 page.tsx
+    │   │   │   │   │   │   ├── 📁 third-party
     │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   └── 📄 layout.tsx
-    │   │   │   │   │   ├── 📁 api/
-    │   │   │   │   │   │   └── 📁 uploads/
-    │   │   │   │   │   │       └── 📁 [[...path]]/
+    │   │   │   │   │   ├── 📁 api
+    │   │   │   │   │   │   └── 📁 uploads
+    │   │   │   │   │   │       └── 📁 [[...path]]
     │   │   │   │   │   │           └── 📄 route.ts
-    │   │   │   │   │   ├── 📁 auth/
-    │   │   │   │   │   │   ├── 📁 activate/
-    │   │   │   │   │   │   │   ├── 📁 [code]/
+    │   │   │   │   │   ├── 📁 auth
+    │   │   │   │   │   │   ├── 📁 activate
+    │   │   │   │   │   │   │   ├── 📁 [code]
     │   │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 forgot/
-    │   │   │   │   │   │   │   ├── 📁 [token]/
+    │   │   │   │   │   │   ├── 📁 forgot
+    │   │   │   │   │   │   │   ├── 📁 [token]
     │   │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 login/
+    │   │   │   │   │   │   ├── 📁 login
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   ├── 📁 login-required/
+    │   │   │   │   │   │   ├── 📁 login-required
     │   │   │   │   │   │   │   └── 📄 page.tsx
     │   │   │   │   │   │   ├── 📄 layout.tsx
     │   │   │   │   │   │   ├── 📄 page.tsx
     │   │   │   │   │   │   └── 📄 return.url.component.tsx
-    │   │   │   │   │   ├── 📁 integrations/
-    │   │   │   │   │   │   └── 📁 social/
-    │   │   │   │   │   │       ├── 📁 [provider]/
+    │   │   │   │   │   ├── 📁 integrations
+    │   │   │   │   │   │   └── 📁 social
+    │   │   │   │   │   │       ├── 📁 [provider]
     │   │   │   │   │   │       │   └── 📄 page.tsx
     │   │   │   │   │   │       └── 📄 layout.tsx
-    │   │   │   │   │   ├── 📁 oauth/
-    │   │   │   │   │   │   └── 📁 authorize/
+    │   │   │   │   │   ├── 📁 oauth
+    │   │   │   │   │   │   └── 📁 authorize
     │   │   │   │   │   │       ├── 📄 layout.tsx
     │   │   │   │   │   │       └── 📄 page.tsx
     │   │   │   │   │   └── 📄 layout.tsx
-    │   │   │   │   ├── 📁 (extension)/
-    │   │   │   │   │   ├── 📁 modal/
-    │   │   │   │   │   │   ├── 📁 [style]/
-    │   │   │   │   │   │   │   └── 📁 [platform]/
+    │   │   │   │   ├── 📁 (extension)
+    │   │   │   │   │   ├── 📁 modal
+    │   │   │   │   │   │   ├── 📁 [style]
+    │   │   │   │   │   │   │   └── 📁 [platform]
     │   │   │   │   │   │   │       └── 📄 page.tsx
     │   │   │   │   │   │   └── 📄 layout.tsx
     │   │   │   │   │   └── 📄 layout.tsx
-    │   │   │   │   ├── 📁 (provider)/
-    │   │   │   │   │   ├── 📁 provider/
-    │   │   │   │   │   │   ├── 📁 [p]/
+    │   │   │   │   ├── 📁 (provider)
+    │   │   │   │   │   ├── 📁 provider
+    │   │   │   │   │   │   ├── 📁 [p]
     │   │   │   │   │   │   │   ├── 📄 bridge.tsx
     │   │   │   │   │   │   │   ├── 📄 in-bridge.tsx
     │   │   │   │   │   │   │   └── 📄 page.tsx
-    │   │   │   │   │   │   └── 📁 add/
+    │   │   │   │   │   │   └── 📁 add
     │   │   │   │   │   │       └── 📄 page.tsx
     │   │   │   │   │   └── 📄 layout.tsx
     │   │   │   │   ├── 🎨 colors.scss
     │   │   │   │   ├── 📄 global-error.tsx
     │   │   │   │   ├── 🎨 global.scss
     │   │   │   │   └── 🎨 polonto.css
-    │   │   │   ├── 📁 components/
-    │   │   │   │   ├── 📁 admin/
+    │   │   │   ├── 📁 components
+    │   │   │   │   ├── 📁 admin
     │   │   │   │   │   ├── 📄 admin-errors.component.tsx
     │   │   │   │   │   └── 📄 admin-stats.component.tsx
-    │   │   │   │   ├── 📁 agents/
+    │   │   │   │   ├── 📁 agents
+    │   │   │   │   │   ├── 📁 knowledge
+    │   │   │   │   │   │   ├── 📄 knowledge.manager.tsx
+    │   │   │   │   │   │   ├── 📄 knowledge.modal.tsx
+    │   │   │   │   │   │   └── 📄 use.knowledge.ts
     │   │   │   │   │   ├── 📄 agent.chat.tsx
     │   │   │   │   │   ├── 📄 agent.input.tsx
     │   │   │   │   │   ├── 📄 agent.textarea.tsx
     │   │   │   │   │   └── 📄 agent.tsx
-    │   │   │   │   ├── 📁 analytics/
+    │   │   │   │   ├── 📁 analytics
     │   │   │   │   │   ├── 📄 analytics.component.tsx
     │   │   │   │   │   ├── 📄 chart-social.tsx
     │   │   │   │   │   ├── 📄 chart.tsx
     │   │   │   │   │   ├── 📄 stars.and.forks.interface.ts
     │   │   │   │   │   ├── 📄 stars.and.forks.tsx
     │   │   │   │   │   └── 📄 stars.table.component.tsx
-    │   │   │   │   ├── 📁 approved-apps/
+    │   │   │   │   ├── 📁 approved-apps
     │   │   │   │   │   └── 📄 approved-apps.component.tsx
-    │   │   │   │   ├── 📁 auth/
-    │   │   │   │   │   ├── 📁 providers/
-    │   │   │   │   │   │   ├── 📁 placeholder/
+    │   │   │   │   ├── 📁 auth
+    │   │   │   │   │   ├── 📁 providers
+    │   │   │   │   │   │   ├── 📁 placeholder
     │   │   │   │   │   │   │   └── 📄 wallet.ui.provider.tsx
     │   │   │   │   │   │   ├── 📄 apple.provider.tsx
     │   │   │   │   │   │   ├── 📄 farcaster.provider.tsx
@@ -380,9 +398,9 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 register.tsx
     │   │   │   │   │   ├── 📄 testimonial.component.tsx
     │   │   │   │   │   └── 📄 testimonial.tsx
-    │   │   │   │   ├── 📁 autopost/
+    │   │   │   │   ├── 📁 autopost
     │   │   │   │   │   └── 📄 autopost.tsx
-    │   │   │   │   ├── 📁 billing/
+    │   │   │   │   ├── 📁 billing
     │   │   │   │   │   ├── 📄 billing.component.tsx
     │   │   │   │   │   ├── 📄 billing.history.component.tsx
     │   │   │   │   │   ├── 📄 embedded.billing.tsx
@@ -392,15 +410,15 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 lifetime.deal.tsx
     │   │   │   │   │   ├── 📄 main.billing.component.tsx
     │   │   │   │   │   └── 📄 use.payment.action.tsx
-    │   │   │   │   ├── 📁 developer/
+    │   │   │   │   ├── 📁 developer
     │   │   │   │   │   ├── 📄 developer.component.tsx
     │   │   │   │   │   └── 📄 developer.icon.component.tsx
-    │   │   │   │   ├── 📁 launches/
-    │   │   │   │   │   ├── 📁 comments/
+    │   │   │   │   ├── 📁 launches
+    │   │   │   │   │   ├── 📁 comments
     │   │   │   │   │   │   └── 📄 comment.component.tsx
-    │   │   │   │   │   ├── 📁 generator/
+    │   │   │   │   │   ├── 📁 generator
     │   │   │   │   │   │   └── 📄 generator.tsx
-    │   │   │   │   │   ├── 📁 helpers/
+    │   │   │   │   │   ├── 📁 helpers
     │   │   │   │   │   │   ├── 📄 date.picker.tsx
     │   │   │   │   │   │   ├── 📄 dnd.provider.tsx
     │   │   │   │   │   │   ├── 📄 isuscitizen.utils.tsx
@@ -417,12 +435,12 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   │   ├── 📄 use.integration.ts
     │   │   │   │   │   │   ├── 📄 use.move.to.integration.tsx
     │   │   │   │   │   │   └── 📄 use.values.ts
-    │   │   │   │   │   ├── 📁 menu/
+    │   │   │   │   │   ├── 📁 menu
     │   │   │   │   │   │   └── 📄 menu.tsx
-    │   │   │   │   │   ├── 📁 polonto/
+    │   │   │   │   │   ├── 📁 polonto
     │   │   │   │   │   │   └── 📄 polonto.picture.generation.tsx
-    │   │   │   │   │   ├── 📁 web3/
-    │   │   │   │   │   │   ├── 📁 providers/
+    │   │   │   │   │   ├── 📁 web3
+    │   │   │   │   │   │   ├── 📁 providers
     │   │   │   │   │   │   │   ├── 📄 moltbook.provider.tsx
     │   │   │   │   │   │   │   ├── 📄 telegram.provider.tsx
     │   │   │   │   │   │   │   └── 📄 wrapcaster.provider.tsx
@@ -459,7 +477,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 tags.component.tsx
     │   │   │   │   │   ├── 📄 time.table.tsx
     │   │   │   │   │   └── 📄 up.down.arrow.tsx
-    │   │   │   │   ├── 📁 layout/
+    │   │   │   │   ├── 📁 layout
     │   │   │   │   │   ├── 📄 announcement.banner.tsx
     │   │   │   │   │   ├── 📄 chatbase.component.tsx
     │   │   │   │   │   ├── 📄 check.payment.tsx
@@ -492,73 +510,73 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 top.menu.tsx
     │   │   │   │   │   ├── 📄 top.tip.tsx
     │   │   │   │   │   └── 📄 user.context.tsx
-    │   │   │   │   ├── 📁 media/
+    │   │   │   │   ├── 📁 media
     │   │   │   │   │   ├── 📄 media.component.tsx
     │   │   │   │   │   └── 📄 new.uploader.tsx
-    │   │   │   │   ├── 📁 new-launch/
-    │   │   │   │   │   ├── 📁 finisher/
+    │   │   │   │   ├── 📁 new-launch
+    │   │   │   │   │   ├── 📁 finisher
     │   │   │   │   │   │   └── 📄 thread.finisher.tsx
-    │   │   │   │   │   ├── 📁 providers/
-    │   │   │   │   │   │   ├── 📁 bluesky/
+    │   │   │   │   │   ├── 📁 providers
+    │   │   │   │   │   │   ├── 📁 bluesky
     │   │   │   │   │   │   │   └── 📄 bluesky.provider.tsx
-    │   │   │   │   │   │   ├── 📁 continue-provider/
-    │   │   │   │   │   │   │   ├── 📁 facebook/
+    │   │   │   │   │   │   ├── 📁 continue-provider
+    │   │   │   │   │   │   │   ├── 📁 facebook
     │   │   │   │   │   │   │   │   └── 📄 facebook.continue.tsx
-    │   │   │   │   │   │   │   ├── 📁 gmb/
+    │   │   │   │   │   │   │   ├── 📁 gmb
     │   │   │   │   │   │   │   │   └── 📄 gmb.continue.tsx
-    │   │   │   │   │   │   │   ├── 📁 instagram/
+    │   │   │   │   │   │   │   ├── 📁 instagram
     │   │   │   │   │   │   │   │   └── 📄 instagram.continue.tsx
-    │   │   │   │   │   │   │   ├── 📁 linkedin/
+    │   │   │   │   │   │   │   ├── 📁 linkedin
     │   │   │   │   │   │   │   │   └── 📄 linkedin.continue.tsx
-    │   │   │   │   │   │   │   ├── 📁 tumblr/
+    │   │   │   │   │   │   │   ├── 📁 tumblr
     │   │   │   │   │   │   │   │   └── 📄 tumblr.continue.tsx
-    │   │   │   │   │   │   │   ├── 📁 youtube/
+    │   │   │   │   │   │   │   ├── 📁 youtube
     │   │   │   │   │   │   │   │   └── 📄 youtube.continue.tsx
     │   │   │   │   │   │   │   ├── 📄 list.tsx
     │   │   │   │   │   │   │   └── 📄 with-continue-provider.tsx
-    │   │   │   │   │   │   ├── 📁 devto/
-    │   │   │   │   │   │   │   ├── 📁 fonts/
+    │   │   │   │   │   │   ├── 📁 devto
+    │   │   │   │   │   │   │   ├── 📁 fonts
     │   │   │   │   │   │   │   │   └── 📄 SFNS.woff2
     │   │   │   │   │   │   │   ├── 📄 devto.provider.tsx
     │   │   │   │   │   │   │   ├── 📄 devto.tags.tsx
     │   │   │   │   │   │   │   └── 📄 select.organization.tsx
-    │   │   │   │   │   │   ├── 📁 discord/
+    │   │   │   │   │   │   ├── 📁 discord
     │   │   │   │   │   │   │   ├── 📄 discord.channel.select.tsx
     │   │   │   │   │   │   │   └── 📄 discord.provider.tsx
-    │   │   │   │   │   │   ├── 📁 dribbble/
+    │   │   │   │   │   │   ├── 📁 dribbble
     │   │   │   │   │   │   │   ├── 📄 dribbble.provider.tsx
     │   │   │   │   │   │   │   └── 📄 dribbble.teams.tsx
-    │   │   │   │   │   │   ├── 📁 facebook/
+    │   │   │   │   │   │   ├── 📁 facebook
     │   │   │   │   │   │   │   ├── 📄 facebook.background.ts
     │   │   │   │   │   │   │   ├── 📄 facebook.preview.tsx
     │   │   │   │   │   │   │   └── 📄 facebook.provider.tsx
-    │   │   │   │   │   │   ├── 📁 gmb/
+    │   │   │   │   │   │   ├── 📁 gmb
     │   │   │   │   │   │   │   └── 📄 gmb.provider.tsx
-    │   │   │   │   │   │   ├── 📁 hashnode/
+    │   │   │   │   │   │   ├── 📁 hashnode
     │   │   │   │   │   │   │   ├── 📄 hashnode.provider.tsx
     │   │   │   │   │   │   │   ├── 📄 hashnode.publications.tsx
     │   │   │   │   │   │   │   └── 📄 hashnode.tags.tsx
-    │   │   │   │   │   │   ├── 📁 instagram/
+    │   │   │   │   │   │   ├── 📁 instagram
     │   │   │   │   │   │   │   ├── 📄 instagram.audio.tsx
     │   │   │   │   │   │   │   ├── 📄 instagram.collaborators.tsx
     │   │   │   │   │   │   │   ├── 📄 instagram.preview.tsx
     │   │   │   │   │   │   │   └── 📄 instagram.tags.tsx
-    │   │   │   │   │   │   ├── 📁 kick/
+    │   │   │   │   │   │   ├── 📁 kick
     │   │   │   │   │   │   │   └── 📄 kick.provider.tsx
-    │   │   │   │   │   │   ├── 📁 lemmy/
+    │   │   │   │   │   │   ├── 📁 lemmy
     │   │   │   │   │   │   │   ├── 📄 lemmy.provider.tsx
     │   │   │   │   │   │   │   └── 📄 subreddit.tsx
-    │   │   │   │   │   │   ├── 📁 linkedin/
+    │   │   │   │   │   │   ├── 📁 linkedin
     │   │   │   │   │   │   │   ├── 📄 linkedin.preview.tsx
     │   │   │   │   │   │   │   └── 📄 linkedin.provider.tsx
-    │   │   │   │   │   │   ├── 📁 listmonk/
+    │   │   │   │   │   │   ├── 📁 listmonk
     │   │   │   │   │   │   │   ├── 📄 listmonk.provider.tsx
     │   │   │   │   │   │   │   ├── 📄 select.list.tsx
     │   │   │   │   │   │   │   └── 📄 select.templates.tsx
-    │   │   │   │   │   │   ├── 📁 mastodon/
+    │   │   │   │   │   │   ├── 📁 mastodon
     │   │   │   │   │   │   │   └── 📄 mastodon.provider.tsx
-    │   │   │   │   │   │   ├── 📁 medium/
-    │   │   │   │   │   │   │   ├── 📁 fonts/
+    │   │   │   │   │   │   ├── 📁 medium
+    │   │   │   │   │   │   │   ├── 📁 fonts
     │   │   │   │   │   │   │   │   ├── 📄 Charter Bold Italic.ttf
     │   │   │   │   │   │   │   │   ├── 📄 Charter Bold.ttf
     │   │   │   │   │   │   │   │   ├── 📄 Charter Italic.ttf
@@ -567,59 +585,59 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   │   │   ├── 📄 medium.provider.tsx
     │   │   │   │   │   │   │   ├── 📄 medium.publications.tsx
     │   │   │   │   │   │   │   └── 📄 medium.tags.tsx
-    │   │   │   │   │   │   ├── 📁 mewe/
+    │   │   │   │   │   │   ├── 📁 mewe
     │   │   │   │   │   │   │   ├── 📄 mewe.group.select.tsx
     │   │   │   │   │   │   │   └── 📄 mewe.provider.tsx
-    │   │   │   │   │   │   ├── 📁 moltbook/
+    │   │   │   │   │   │   ├── 📁 moltbook
     │   │   │   │   │   │   │   └── 📄 moltbook.provider.tsx
-    │   │   │   │   │   │   ├── 📁 nostr/
+    │   │   │   │   │   │   ├── 📁 nostr
     │   │   │   │   │   │   │   └── 📄 nostr.provider.tsx
-    │   │   │   │   │   │   ├── 📁 pinterest/
+    │   │   │   │   │   │   ├── 📁 pinterest
     │   │   │   │   │   │   │   ├── 📄 pinterest.board.tsx
     │   │   │   │   │   │   │   ├── 📄 pinterest.preview.tsx
     │   │   │   │   │   │   │   └── 📄 pinterest.provider.tsx
-    │   │   │   │   │   │   ├── 📁 reddit/
+    │   │   │   │   │   │   ├── 📁 reddit
     │   │   │   │   │   │   │   ├── 📄 reddit.provider.tsx
     │   │   │   │   │   │   │   └── 📄 subreddit.tsx
-    │   │   │   │   │   │   ├── 📁 skool/
+    │   │   │   │   │   │   ├── 📁 skool
     │   │   │   │   │   │   │   ├── 📄 skool.group.select.tsx
     │   │   │   │   │   │   │   ├── 📄 skool.label.select.tsx
     │   │   │   │   │   │   │   └── 📄 skool.provider.tsx
-    │   │   │   │   │   │   ├── 📁 slack/
+    │   │   │   │   │   │   ├── 📁 slack
     │   │   │   │   │   │   │   ├── 📄 slack.channel.select.tsx
     │   │   │   │   │   │   │   └── 📄 slack.provider.tsx
-    │   │   │   │   │   │   ├── 📁 telegram/
+    │   │   │   │   │   │   ├── 📁 telegram
     │   │   │   │   │   │   │   └── 📄 telegram.provider.tsx
-    │   │   │   │   │   │   ├── 📁 threads/
+    │   │   │   │   │   │   ├── 📁 threads
     │   │   │   │   │   │   │   └── 📄 threads.provider.tsx
-    │   │   │   │   │   │   ├── 📁 tiktok/
+    │   │   │   │   │   │   ├── 📁 tiktok
     │   │   │   │   │   │   │   ├── 📄 tiktok.location.tsx
     │   │   │   │   │   │   │   ├── 📄 tiktok.music.tsx
     │   │   │   │   │   │   │   ├── 📄 tiktok.preview.tsx
     │   │   │   │   │   │   │   └── 📄 tiktok.provider.tsx
-    │   │   │   │   │   │   ├── 📁 tumblr/
+    │   │   │   │   │   │   ├── 📁 tumblr
     │   │   │   │   │   │   │   └── 📄 tumblr.provider.tsx
-    │   │   │   │   │   │   ├── 📁 twitch/
+    │   │   │   │   │   │   ├── 📁 twitch
     │   │   │   │   │   │   │   └── 📄 twitch.provider.tsx
-    │   │   │   │   │   │   ├── 📁 vk/
+    │   │   │   │   │   │   ├── 📁 vk
     │   │   │   │   │   │   │   └── 📄 vk.provider.tsx
-    │   │   │   │   │   │   ├── 📁 warpcast/
+    │   │   │   │   │   │   ├── 📁 warpcast
     │   │   │   │   │   │   │   ├── 📄 subreddit.tsx
     │   │   │   │   │   │   │   └── 📄 warpcast.provider.tsx
-    │   │   │   │   │   │   ├── 📁 whop/
+    │   │   │   │   │   │   ├── 📁 whop
     │   │   │   │   │   │   │   ├── 📄 whop.company.select.tsx
     │   │   │   │   │   │   │   ├── 📄 whop.experience.select.tsx
     │   │   │   │   │   │   │   └── 📄 whop.provider.tsx
-    │   │   │   │   │   │   ├── 📁 wordpress/
+    │   │   │   │   │   │   ├── 📁 wordpress
     │   │   │   │   │   │   │   ├── 📄 wordpress.post.type.tsx
     │   │   │   │   │   │   │   ├── 📄 wordpress.provider.tsx
     │   │   │   │   │   │   │   └── 📄 wordpress.terms.tsx
-    │   │   │   │   │   │   ├── 📁 x/
-    │   │   │   │   │   │   │   ├── 📁 fonts/
+    │   │   │   │   │   │   ├── 📁 x
+    │   │   │   │   │   │   │   ├── 📁 fonts
     │   │   │   │   │   │   │   │   ├── 📄 Chirp-Bold.woff2
     │   │   │   │   │   │   │   │   └── 📄 Chirp-Regular.woff2
     │   │   │   │   │   │   │   └── 📄 x.provider.tsx
-    │   │   │   │   │   │   ├── 📁 youtube/
+    │   │   │   │   │   │   ├── 📁 youtube
     │   │   │   │   │   │   │   ├── 📄 youtube.preview.tsx
     │   │   │   │   │   │   │   └── 📄 youtube.provider.tsx
     │   │   │   │   │   │   ├── 📄 high.order.provider.tsx
@@ -643,7 +661,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 select.current.tsx
     │   │   │   │   │   ├── 📄 store.ts
     │   │   │   │   │   └── 📄 u.text.tsx
-    │   │   │   │   ├── 📁 new-layout/
+    │   │   │   │   ├── 📁 new-layout
     │   │   │   │   │   ├── 📄 billing.after.tsx
     │   │   │   │   │   ├── 📄 change.dir.client.tsx
     │   │   │   │   │   ├── 📄 change.dir.tsx
@@ -653,25 +671,25 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 menu-item.tsx
     │   │   │   │   │   ├── 📄 mobile.integration.tsx
     │   │   │   │   │   └── 📄 sentry.feedback.component.tsx
-    │   │   │   │   ├── 📁 notifications/
+    │   │   │   │   ├── 📁 notifications
     │   │   │   │   │   └── 📄 notification.component.tsx
-    │   │   │   │   ├── 📁 oauth/
+    │   │   │   │   ├── 📁 oauth
     │   │   │   │   │   ├── 📄 authorize.component.tsx
     │   │   │   │   │   └── 📄 self.hosted.component.tsx
-    │   │   │   │   ├── 📁 onboarding/
+    │   │   │   │   ├── 📁 onboarding
     │   │   │   │   │   ├── 📄 github.onboarding.tsx
     │   │   │   │   │   ├── 📄 onboarding.modal.tsx
     │   │   │   │   │   └── 📄 onboarding.tsx
-    │   │   │   │   ├── 📁 platform-analytics/
+    │   │   │   │   ├── 📁 platform-analytics
     │   │   │   │   │   ├── 📄 platform.analytics.tsx
     │   │   │   │   │   └── 📄 render.analytics.tsx
-    │   │   │   │   ├── 📁 plugs/
+    │   │   │   │   ├── 📁 plugs
     │   │   │   │   │   ├── 📄 plug.tsx
     │   │   │   │   │   ├── 📄 plugs.context.ts
     │   │   │   │   │   └── 📄 plugs.tsx
-    │   │   │   │   ├── 📁 post-url-selector/
+    │   │   │   │   ├── 📁 post-url-selector
     │   │   │   │   │   └── 📄 post.url.selector.tsx
-    │   │   │   │   ├── 📁 preview/
+    │   │   │   │   ├── 📁 preview
     │   │   │   │   │   ├── 📄 comments.components.tsx
     │   │   │   │   │   ├── 📄 copy.client.tsx
     │   │   │   │   │   ├── 📄 post.content.client.tsx
@@ -679,14 +697,14 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 preview.wrapper.tsx
     │   │   │   │   │   ├── 📄 render.preview.date.client.tsx
     │   │   │   │   │   └── 📄 render.preview.date.tsx
-    │   │   │   │   ├── 📁 provider-preview/
+    │   │   │   │   ├── 📁 provider-preview
     │   │   │   │   │   └── 📄 preview.provider.component.tsx
-    │   │   │   │   ├── 📁 public-api/
+    │   │   │   │   ├── 📁 public-api
     │   │   │   │   │   ├── 📄 mcp.client.icons.tsx
     │   │   │   │   │   └── 📄 public.component.tsx
-    │   │   │   │   ├── 📁 sets/
+    │   │   │   │   ├── 📁 sets
     │   │   │   │   │   └── 📄 sets.tsx
-    │   │   │   │   ├── 📁 settings/
+    │   │   │   │   ├── 📁 settings
     │   │   │   │   │   ├── 📄 apps.component.tsx
     │   │   │   │   │   ├── 📄 authentication.component.tsx
     │   │   │   │   │   ├── 📄 delete-account.component.tsx
@@ -697,10 +715,10 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 shortlink-preference.component.tsx
     │   │   │   │   │   ├── 📄 signatures.component.tsx
     │   │   │   │   │   └── 📄 teams.component.tsx
-    │   │   │   │   ├── 📁 standalone-modal/
+    │   │   │   │   ├── 📁 standalone-modal
     │   │   │   │   │   └── 📄 standalone.modal.tsx
-    │   │   │   │   ├── 📁 third-parties/
-    │   │   │   │   │   ├── 📁 providers/
+    │   │   │   │   ├── 📁 third-parties
+    │   │   │   │   │   ├── 📁 providers
     │   │   │   │   │   │   └── 📄 heygen.provider.tsx
     │   │   │   │   │   ├── 📄 slider.component.tsx
     │   │   │   │   │   ├── 📄 third-party.component.tsx
@@ -709,26 +727,26 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 third-party.media-library.tsx
     │   │   │   │   │   ├── 📄 third-party.media.tsx
     │   │   │   │   │   └── 📄 third-party.wrapper.tsx
-    │   │   │   │   ├── 📁 ui/
-    │   │   │   │   │   ├── 📁 icons/
+    │   │   │   │   ├── 📁 ui
+    │   │   │   │   │   ├── 📁 icons
     │   │   │   │   │   │   └── 📄 index.tsx
     │   │   │   │   │   ├── 📄 bottom.sheet.component.tsx
     │   │   │   │   │   ├── 📄 check.icon.component.tsx
     │   │   │   │   │   ├── 📄 is.scroll.hook.tsx
     │   │   │   │   │   ├── 📄 logo-text.component.tsx
     │   │   │   │   │   └── 📄 translated-label.tsx
-    │   │   │   │   ├── 📁 videos/
-    │   │   │   │   │   ├── 📁 providers/
+    │   │   │   │   ├── 📁 videos
+    │   │   │   │   │   ├── 📁 providers
     │   │   │   │   │   │   ├── 📄 image-text-slides.provider.tsx
     │   │   │   │   │   │   └── 📄 seedance.provider.tsx
     │   │   │   │   │   ├── 📄 video.context.wrapper.tsx
     │   │   │   │   │   ├── 📄 video.render.component.tsx
     │   │   │   │   │   └── 📄 video.wrapper.tsx
-    │   │   │   │   ├── 📁 webhooks/
+    │   │   │   │   ├── 📁 webhooks
     │   │   │   │   │   └── 📄 webhooks.tsx
     │   │   │   │   └── 📄 signature.tsx
-    │   │   │   ├── 📁 fonts/
-    │   │   │   │   └── 📁 plus-jakarta-sans/
+    │   │   │   ├── 📁 fonts
+    │   │   │   │   └── 📁 plus-jakarta-sans
     │   │   │   │       ├── 📄 OFL.txt
     │   │   │   │       ├── 📄 PlusJakartaSans-Italic.woff2
     │   │   │   │       ├── 📄 PlusJakartaSans.woff2
@@ -748,9 +766,9 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── 📄 postcss.config.mjs
     │   │   ├── 📄 tailwind.config.cjs
     │   │   └── ⚙️ tsconfig.json
-    │   ├── 📁 orchestrator/
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 activities/
+    │   ├── 📁 orchestrator
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 activities
     │   │   │   │   ├── 📄 autopost.activity.ts
     │   │   │   │   ├── 📄 clipping.activity.ts
     │   │   │   │   ├── 📄 email.activity.ts
@@ -758,11 +776,11 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   ├── 📄 media.activity.ts
     │   │   │   │   ├── 📄 post.activity.ts
     │   │   │   │   └── 📄 video.activity.ts
-    │   │   │   ├── 📁 signals/
+    │   │   │   ├── 📁 signals
     │   │   │   │   ├── 📄 email.signal.ts
     │   │   │   │   └── 📄 send.email.signal.ts
-    │   │   │   ├── 📁 workflows/
-    │   │   │   │   ├── 📁 post-workflows/
+    │   │   │   ├── 📁 workflows
+    │   │   │   │   ├── 📁 post-workflows
     │   │   │   │   │   ├── 📄 post.workflow.v1.0.1.ts
     │   │   │   │   │   ├── 📄 post.workflow.v1.0.2.ts
     │   │   │   │   │   ├── 📄 post.workflow.v1.0.3.ts
@@ -793,33 +811,33 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── ⚙️ nest-cli.json
     │   │   ├── ⚙️ package.json
     │   │   └── ⚙️ tsconfig.json
-    │   └── 📁 sdk/
-    │       ├── 📁 src/
+    │   └── 📁 sdk
+    │       ├── 📁 src
     │       │   └── 📄 index.ts
     │       ├── ⚙️ .npmignore
     │       ├── 📝 README.md
     │       ├── ⚙️ package.json
     │       ├── ⚙️ tsconfig.json
     │       └── 📄 tsup.config.ts
-    ├── 📁 dynamicconfig/
+    ├── 📁 dynamicconfig
     │   ├── ⚙️ development-cass.yaml
     │   └── ⚙️ development-sql.yaml
-    ├── 📁 libraries/
-    │   ├── 📁 helpers/
-    │   │   └── 📁 src/
-    │   │       ├── 📁 auth/
+    ├── 📁 libraries
+    │   ├── 📁 helpers
+    │   │   └── 📁 src
+    │   │       ├── 📁 auth
     │   │       │   └── 📄 auth.service.ts
-    │   │       ├── 📁 configuration/
+    │   │       ├── 📁 configuration
     │   │       │   └── 📄 configuration.checker.ts
-    │   │       ├── 📁 decorators/
+    │   │       ├── 📁 decorators
     │   │       │   ├── 📄 plug.decorator.ts
     │   │       │   └── 📄 post.plug.ts
-    │   │       ├── 📁 subdomain/
+    │   │       ├── 📁 subdomain
     │   │       │   ├── 📄 all.two.level.subdomain.ts
     │   │       │   └── 📄 subdomain.management.ts
-    │   │       ├── 📁 swagger/
+    │   │       ├── 📁 swagger
     │   │       │   └── 📄 load.swagger.ts
-    │   │       └── 📁 utils/
+    │   │       └── 📁 utils
     │   │           ├── 📄 count.length.ts
     │   │           ├── 📄 custom.fetch.func.ts
     │   │           ├── 📄 custom.fetch.tsx
@@ -839,26 +857,26 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │           ├── 📄 utm.saver.tsx
     │   │           ├── 📄 valid.images.ts
     │   │           └── 📄 valid.url.path.ts
-    │   ├── 📁 nestjs-libraries/
-    │   │   ├── 📁 src/
-    │   │   │   ├── 📁 3rdparties/
-    │   │   │   │   ├── 📁 heygen/
+    │   ├── 📁 nestjs-libraries
+    │   │   ├── 📁 src
+    │   │   │   ├── 📁 3rdparties
+    │   │   │   │   ├── 📁 heygen
     │   │   │   │   │   └── 📄 heygen.provider.ts
-    │   │   │   │   ├── 📁 hubspot/
+    │   │   │   │   ├── 📁 hubspot
     │   │   │   │   │   └── 📄 hubspot.provider.ts
-    │   │   │   │   ├── 📁 reelfarm/
+    │   │   │   │   ├── 📁 reelfarm
     │   │   │   │   │   └── 📄 reelfarm.provider.ts
     │   │   │   │   ├── 📄 thirdparty.interface.ts
     │   │   │   │   ├── 📄 thirdparty.manager.ts
     │   │   │   │   └── 📄 thirdparty.module.ts
-    │   │   │   ├── 📁 agent/
+    │   │   │   ├── 📁 agent
     │   │   │   │   ├── 📄 agent.categories.ts
     │   │   │   │   ├── 📄 agent.graph.insert.service.ts
     │   │   │   │   ├── 📄 agent.graph.service.ts
     │   │   │   │   ├── 📄 agent.module.ts
     │   │   │   │   └── 📄 agent.topics.ts
-    │   │   │   ├── 📁 chat/
-    │   │   │   │   ├── 📁 tools/
+    │   │   │   ├── 📁 chat
+    │   │   │   │   ├── 📁 tools
     │   │   │   │   │   ├── 📄 clipping.status.tool.ts
     │   │   │   │   │   ├── 📄 clipping.tool.ts
     │   │   │   │   │   ├── 📄 clipping.widget.ticket.tool.ts
@@ -871,6 +889,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 integration.schedule.post.ts
     │   │   │   │   │   ├── 📄 integration.trigger.tool.ts
     │   │   │   │   │   ├── 📄 integration.validation.tool.ts
+    │   │   │   │   │   ├── 📄 knowledge.retrieve.tool.ts
     │   │   │   │   │   ├── 📄 media.list.tool.ts
     │   │   │   │   │   ├── 📄 media.status.tool.ts
     │   │   │   │   │   ├── 📄 post.settings.tool.ts
@@ -882,7 +901,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 upload.widget.tool.ts
     │   │   │   │   │   ├── 📄 video.function.tool.ts
     │   │   │   │   │   └── 📄 video.status.tool.ts
-    │   │   │   │   ├── 📁 ui/
+    │   │   │   │   ├── 📁 ui
     │   │   │   │   │   ├── 📄 clipping.widget.ts
     │   │   │   │   │   └── 📄 upload.widget.ts
     │   │   │   │   ├── 📄 agent.tool.interface.ts
@@ -898,121 +917,127 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   ├── 📄 rules.description.decorator.ts
     │   │   │   │   ├── 📄 start.mcp.ts
     │   │   │   │   └── 📄 validation.schemas.helper.ts
-    │   │   │   ├── 📁 database/
-    │   │   │   │   └── 📁 prisma/
-    │   │   │   │       ├── 📁 admin-stats/
+    │   │   │   ├── 📁 database
+    │   │   │   │   └── 📁 prisma
+    │   │   │   │       ├── 📁 admin-stats
     │   │   │   │       │   ├── 📄 admin-stats.repository.ts
     │   │   │   │       │   └── 📄 admin-stats.service.ts
-    │   │   │   │       ├── 📁 agencies/
+    │   │   │   │       ├── 📁 agencies
     │   │   │   │       │   ├── 📄 agencies.repository.ts
     │   │   │   │       │   └── 📄 agencies.service.ts
-    │   │   │   │       ├── 📁 announcements/
+    │   │   │   │       ├── 📁 announcements
     │   │   │   │       │   ├── 📄 announcements.repository.ts
     │   │   │   │       │   └── 📄 announcements.service.ts
-    │   │   │   │       ├── 📁 autopost/
+    │   │   │   │       ├── 📁 autopost
     │   │   │   │       │   ├── 📄 autopost.repository.ts
     │   │   │   │       │   └── 📄 autopost.service.ts
-    │   │   │   │       ├── 📁 clipping/
+    │   │   │   │       ├── 📁 clipping
     │   │   │   │       │   ├── 📄 clipping.repository.ts
     │   │   │   │       │   └── 📄 clipping.service.ts
-    │   │   │   │       ├── 📁 errors/
+    │   │   │   │       ├── 📁 errors
     │   │   │   │       │   ├── 📄 errors.repository.ts
     │   │   │   │       │   └── 📄 errors.service.ts
-    │   │   │   │       ├── 📁 integrations/
+    │   │   │   │       ├── 📁 integrations
     │   │   │   │       │   ├── 📄 integration.repository.ts
     │   │   │   │       │   └── 📄 integration.service.ts
-    │   │   │   │       ├── 📁 media/
+    │   │   │   │       ├── 📁 knowledge
+    │   │   │   │       │   ├── 📄 knowledge.repository.ts
+    │   │   │   │       │   ├── 📄 knowledge.service.ts
+    │   │   │   │       │   └── 📄 knowledge.spec.ts
+    │   │   │   │       ├── 📁 media
     │   │   │   │       │   ├── 📄 media.repository.ts
     │   │   │   │       │   └── 📄 media.service.ts
-    │   │   │   │       ├── 📁 notifications/
+    │   │   │   │       ├── 📁 notifications
     │   │   │   │       │   ├── 📄 notification.service.ts
     │   │   │   │       │   └── 📄 notifications.repository.ts
-    │   │   │   │       ├── 📁 oauth/
+    │   │   │   │       ├── 📁 oauth
     │   │   │   │       │   ├── 📄 oauth.repository.ts
     │   │   │   │       │   └── 📄 oauth.service.ts
-    │   │   │   │       ├── 📁 organizations/
+    │   │   │   │       ├── 📁 organizations
     │   │   │   │       │   ├── 📄 organization.repository.ts
     │   │   │   │       │   └── 📄 organization.service.ts
-    │   │   │   │       ├── 📁 posts/
+    │   │   │   │       ├── 📁 posts
     │   │   │   │       │   ├── 📄 posts.repository.ts
     │   │   │   │       │   └── 📄 posts.service.ts
-    │   │   │   │       ├── 📁 sets/
+    │   │   │   │       ├── 📁 sets
     │   │   │   │       │   ├── 📄 sets.repository.ts
     │   │   │   │       │   └── 📄 sets.service.ts
-    │   │   │   │       ├── 📁 signatures/
+    │   │   │   │       ├── 📁 signatures
     │   │   │   │       │   ├── 📄 signature.repository.ts
     │   │   │   │       │   └── 📄 signature.service.ts
-    │   │   │   │       ├── 📁 subscriptions/
+    │   │   │   │       ├── 📁 subscriptions
     │   │   │   │       │   ├── 📄 pricing.ts
     │   │   │   │       │   ├── 📄 subscription.repository.ts
     │   │   │   │       │   └── 📄 subscription.service.ts
-    │   │   │   │       ├── 📁 third-party/
+    │   │   │   │       ├── 📁 third-party
     │   │   │   │       │   ├── 📄 third-party.repository.ts
     │   │   │   │       │   └── 📄 third-party.service.ts
-    │   │   │   │       ├── 📁 users/
+    │   │   │   │       ├── 📁 users
     │   │   │   │       │   ├── 📄 users.repository.ts
     │   │   │   │       │   └── 📄 users.service.ts
-    │   │   │   │       ├── 📁 webhooks/
+    │   │   │   │       ├── 📁 webhooks
     │   │   │   │       │   ├── 📄 webhooks.repository.ts
     │   │   │   │       │   └── 📄 webhooks.service.ts
     │   │   │   │       ├── 📄 database.module.ts
     │   │   │   │       ├── 📄 prisma.service.ts
     │   │   │   │       └── 📄 schema.prisma
-    │   │   │   ├── 📁 deepgram/
+    │   │   │   ├── 📁 deepgram
     │   │   │   │   └── 📄 deepgram.service.ts
-    │   │   │   ├── 📁 dtos/
-    │   │   │   │   ├── 📁 agencies/
+    │   │   │   ├── 📁 dtos
+    │   │   │   │   ├── 📁 agencies
     │   │   │   │   │   └── 📄 create.agency.dto.ts
-    │   │   │   │   ├── 📁 analytics/
+    │   │   │   │   ├── 📁 analytics
     │   │   │   │   │   ├── 📄 get.org.activity.dto.ts
     │   │   │   │   │   └── 📄 stars.list.dto.ts
-    │   │   │   │   ├── 📁 announcements/
+    │   │   │   │   ├── 📁 announcements
     │   │   │   │   │   └── 📄 announcements.dto.ts
-    │   │   │   │   ├── 📁 auth/
+    │   │   │   │   ├── 📁 auth
     │   │   │   │   │   ├── 📄 create.org.user.dto.ts
     │   │   │   │   │   ├── 📄 forgot-return.password.dto.ts
     │   │   │   │   │   ├── 📄 forgot.password.dto.ts
     │   │   │   │   │   ├── 📄 login.user.dto.ts
     │   │   │   │   │   └── 📄 resend-activation.dto.ts
-    │   │   │   │   ├── 📁 autopost/
+    │   │   │   │   ├── 📁 autopost
     │   │   │   │   │   └── 📄 autopost.dto.ts
-    │   │   │   │   ├── 📁 billing/
+    │   │   │   │   ├── 📁 billing
     │   │   │   │   │   ├── 📄 admin.apply.coupon.dto.ts
     │   │   │   │   │   ├── 📄 billing.subscribe.dto.ts
     │   │   │   │   │   ├── 📄 billing.sync.dto.ts
     │   │   │   │   │   └── 📄 reset.credits.dto.ts
-    │   │   │   │   ├── 📁 clipping/
+    │   │   │   │   ├── 📁 clipping
     │   │   │   │   │   └── 📄 clipping.dto.ts
-    │   │   │   │   ├── 📁 comments/
+    │   │   │   │   ├── 📁 comments
     │   │   │   │   │   └── 📄 add.comment.dto.ts
-    │   │   │   │   ├── 📁 generator/
+    │   │   │   │   ├── 📁 generator
     │   │   │   │   │   ├── 📄 create.generated.posts.dto.ts
     │   │   │   │   │   └── 📄 generator.dto.ts
-    │   │   │   │   ├── 📁 integrations/
+    │   │   │   │   ├── 📁 integrations
     │   │   │   │   │   ├── 📄 api.key.dto.ts
     │   │   │   │   │   ├── 📄 connect.integration.dto.ts
     │   │   │   │   │   ├── 📄 customer.name.dto.ts
     │   │   │   │   │   ├── 📄 integration.function.dto.ts
     │   │   │   │   │   ├── 📄 integration.name.dto.ts
     │   │   │   │   │   └── 📄 integration.time.dto.ts
-    │   │   │   │   ├── 📁 media/
+    │   │   │   │   ├── 📁 knowledge
+    │   │   │   │   │   └── 📄 knowledge.dto.ts
+    │   │   │   │   ├── 📁 media
     │   │   │   │   │   ├── 📄 get.media.dto.ts
     │   │   │   │   │   ├── 📄 media.dto.ts
     │   │   │   │   │   ├── 📄 save.media.information.dto.ts
     │   │   │   │   │   └── 📄 upload.dto.ts
-    │   │   │   │   ├── 📁 notifications/
+    │   │   │   │   ├── 📁 notifications
     │   │   │   │   │   └── 📄 get.notifications.dto.ts
-    │   │   │   │   ├── 📁 oauth/
+    │   │   │   │   ├── 📁 oauth
     │   │   │   │   │   ├── 📄 authorize-oauth.dto.ts
     │   │   │   │   │   ├── 📄 create-oauth-app.dto.ts
     │   │   │   │   │   ├── 📄 hubspot-install.dto.ts
     │   │   │   │   │   ├── 📄 register-client.dto.ts
     │   │   │   │   │   ├── 📄 token-exchange.dto.ts
     │   │   │   │   │   └── 📄 update-oauth-app.dto.ts
-    │   │   │   │   ├── 📁 plugs/
+    │   │   │   │   ├── 📁 plugs
     │   │   │   │   │   └── 📄 plug.dto.ts
-    │   │   │   │   ├── 📁 posts/
-    │   │   │   │   │   ├── 📁 providers-settings/
+    │   │   │   │   ├── 📁 posts
+    │   │   │   │   │   ├── 📁 providers-settings
     │   │   │   │   │   │   ├── 📄 all.providers.settings.ts
     │   │   │   │   │   │   ├── 📄 dev.to.settings.dto.ts
     │   │   │   │   │   │   ├── 📄 dev.to.tags.settings.dto.ts
@@ -1041,7 +1066,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   │   ├── 📄 wordpress.dto.ts
     │   │   │   │   │   │   ├── 📄 x.dto.ts
     │   │   │   │   │   │   └── 📄 youtube.settings.dto.ts
-    │   │   │   │   │   ├── 📁 transformers/
+    │   │   │   │   │   ├── 📁 transformers
     │   │   │   │   │   │   └── 📄 integration.settings.transformer.ts
     │   │   │   │   │   ├── 📄 change.post.status.dto.ts
     │   │   │   │   │   ├── 📄 create.post.dto.ts
@@ -1049,34 +1074,34 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   ├── 📄 get.posts.dto.ts
     │   │   │   │   │   ├── 📄 get.posts.list.dto.ts
     │   │   │   │   │   └── 📄 update.post.settings.dto.ts
-    │   │   │   │   ├── 📁 sets/
+    │   │   │   │   ├── 📁 sets
     │   │   │   │   │   └── 📄 sets.dto.ts
-    │   │   │   │   ├── 📁 settings/
+    │   │   │   │   ├── 📁 settings
     │   │   │   │   │   ├── 📄 add.team.member.dto.ts
     │   │   │   │   │   ├── 📄 admin.add.team.member.dto.ts
     │   │   │   │   │   └── 📄 shortlink-preference.dto.ts
-    │   │   │   │   ├── 📁 signature/
+    │   │   │   │   ├── 📁 signature
     │   │   │   │   │   └── 📄 signature.dto.ts
-    │   │   │   │   ├── 📁 third-party/
+    │   │   │   │   ├── 📁 third-party
     │   │   │   │   │   └── 📄 import-media.dto.ts
-    │   │   │   │   ├── 📁 users/
+    │   │   │   │   ├── 📁 users
     │   │   │   │   │   ├── 📄 email-notifications.dto.ts
     │   │   │   │   │   ├── 📄 timezone.dto.ts
     │   │   │   │   │   └── 📄 user.details.dto.ts
-    │   │   │   │   ├── 📁 videos/
+    │   │   │   │   ├── 📁 videos
     │   │   │   │   │   ├── 📄 video.dto.ts
     │   │   │   │   │   └── 📄 video.function.dto.ts
-    │   │   │   │   └── 📁 webhooks/
+    │   │   │   │   └── 📁 webhooks
     │   │   │   │       ├── 📄 ssrf.safe.dispatcher.ts
     │   │   │   │       ├── 📄 webhook.url.validator.ts
     │   │   │   │       └── 📄 webhooks.dto.ts
-    │   │   │   ├── 📁 emails/
+    │   │   │   ├── 📁 emails
     │   │   │   │   ├── 📄 email.interface.ts
     │   │   │   │   ├── 📄 empty.provider.ts
     │   │   │   │   ├── 📄 node.mailer.provider.ts
     │   │   │   │   └── 📄 resend.provider.ts
-    │   │   │   ├── 📁 integrations/
-    │   │   │   │   ├── 📁 social/
+    │   │   │   ├── 📁 integrations
+    │   │   │   │   ├── 📁 social
     │   │   │   │   │   ├── 📄 bluesky.provider.ts
     │   │   │   │   │   ├── 📄 dev.to.provider.ts
     │   │   │   │   │   ├── 📄 discord.provider.ts
@@ -1120,27 +1145,27 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   ├── 📄 refresh.integration.service.ts
     │   │   │   │   ├── 📄 social.abstract.ts
     │   │   │   │   └── 📄 tool.decorator.ts
-    │   │   │   ├── 📁 newsletter/
-    │   │   │   │   ├── 📁 providers/
+    │   │   │   ├── 📁 newsletter
+    │   │   │   │   ├── 📁 providers
     │   │   │   │   │   ├── 📄 beehiiv.provider.ts
     │   │   │   │   │   ├── 📄 email-empty.provider.ts
     │   │   │   │   │   └── 📄 listmonk.provider.ts
     │   │   │   │   ├── 📄 newsletter.interface.ts
     │   │   │   │   ├── 📄 newsletter.service.ts
     │   │   │   │   └── 📄 providers.ts
-    │   │   │   ├── 📁 openai/
+    │   │   │   ├── 📁 openai
     │   │   │   │   ├── 📄 extract.content.service.ts
     │   │   │   │   ├── 📄 fal.service.ts
     │   │   │   │   ├── 📄 generation.error.ts
     │   │   │   │   └── 📄 openai.service.ts
-    │   │   │   ├── 📁 redis/
+    │   │   │   ├── 📁 redis
     │   │   │   │   └── 📄 redis.service.ts
-    │   │   │   ├── 📁 sentry/
+    │   │   │   ├── 📁 sentry
     │   │   │   │   ├── 📄 initialize.sentry.ts
     │   │   │   │   └── 📄 sentry.exception.ts
-    │   │   │   ├── 📁 services/
-    │   │   │   │   ├── 📁 payment/
-    │   │   │   │   │   ├── 📁 providers/
+    │   │   │   ├── 📁 services
+    │   │   │   │   ├── 📁 payment
+    │   │   │   │   │   ├── 📁 providers
     │   │   │   │   │   │   └── 📄 revenuecat.provider.ts
     │   │   │   │   │   ├── 📄 payment.provider.interface.ts
     │   │   │   │   │   ├── 📄 payment.provider.manager.ts
@@ -1153,8 +1178,8 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   ├── 📄 make.secure.id.ts
     │   │   │   │   ├── 📄 stripe.country.list.ts
     │   │   │   │   └── 📄 stripe.service.ts
-    │   │   │   ├── 📁 short-linking/
-    │   │   │   │   ├── 📁 providers/
+    │   │   │   ├── 📁 short-linking
+    │   │   │   │   ├── 📁 providers
     │   │   │   │   │   ├── 📄 dub.ts
     │   │   │   │   │   ├── 📄 empty.ts
     │   │   │   │   │   ├── 📄 kutt.ts
@@ -1162,19 +1187,19 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   │   └── 📄 short.io.ts
     │   │   │   │   ├── 📄 short-linking.interface.ts
     │   │   │   │   └── 📄 short.link.service.ts
-    │   │   │   ├── 📁 temporal/
+    │   │   │   ├── 📁 temporal
     │   │   │   │   ├── 📄 email.queues.ts
     │   │   │   │   ├── 📄 infinite.workflow.register.ts
     │   │   │   │   ├── 📄 temporal.heartbeat.ts
     │   │   │   │   ├── 📄 temporal.module.ts
     │   │   │   │   ├── 📄 temporal.register.ts
     │   │   │   │   └── 📄 temporal.search.attribute.ts
-    │   │   │   ├── 📁 throttler/
+    │   │   │   ├── 📁 throttler
     │   │   │   │   └── 📄 throttler.provider.ts
-    │   │   │   ├── 📁 track/
+    │   │   │   ├── 📁 track
     │   │   │   │   ├── 📄 track.cookies.ts
     │   │   │   │   └── 📄 track.service.ts
-    │   │   │   ├── 📁 upload/
+    │   │   │   ├── 📁 upload
     │   │   │   │   ├── 📄 clipping.processor.interface.ts
     │   │   │   │   ├── 📄 cloudflare.storage.ts
     │   │   │   │   ├── 📄 custom.upload.validation.ts
@@ -1187,17 +1212,17 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   │   │   ├── 📄 upload.factory.ts
     │   │   │   │   ├── 📄 upload.interface.ts
     │   │   │   │   └── 📄 upload.module.ts
-    │   │   │   ├── 📁 user/
+    │   │   │   ├── 📁 user
     │   │   │   │   ├── 📄 include.deleted.from.request.ts
     │   │   │   │   ├── 📄 oauth.user.id.from.request.ts
     │   │   │   │   ├── 📄 org.from.request.ts
     │   │   │   │   ├── 📄 track.enum.ts
     │   │   │   │   ├── 📄 user.agent.ts
     │   │   │   │   └── 📄 user.from.request.ts
-    │   │   │   └── 📁 videos/
-    │   │   │       ├── 📁 images-slides/
+    │   │   │   └── 📁 videos
+    │   │   │       ├── 📁 images-slides
     │   │   │       │   └── 📄 images.slides.ts
-    │   │   │       ├── 📁 seedance/
+    │   │   │       ├── 📁 seedance
     │   │   │       │   └── 📄 seedance.ts
     │   │   │       ├── 📄 video.interface.ts
     │   │   │       ├── 📄 video.manager.ts
@@ -1206,9 +1231,9 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │   │   ├── 📝 README.md
     │   │   ├── ⚙️ tsconfig.json
     │   │   └── ⚙️ tsconfig.lib.json
-    │   └── 📁 react-shared-libraries/
-    │       ├── 📁 src/
-    │       │   ├── 📁 form/
+    │   └── 📁 react-shared-libraries
+    │       ├── 📁 src
+    │       │   ├── 📁 form
     │       │   │   ├── 📄 button.tsx
     │       │   │   ├── 📄 canonical.tsx
     │       │   │   ├── 📄 checkbox.tsx
@@ -1220,7 +1245,7 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │       │   │   ├── 📄 slider.tsx
     │       │   │   ├── 📄 textarea.tsx
     │       │   │   └── 📄 total.tsx
-    │       │   ├── 📁 helpers/
+    │       │   ├── 📁 helpers
     │       │   │   ├── 📄 delete.dialog.tsx
     │       │   │   ├── 📄 image.with.fallback.tsx
     │       │   │   ├── 📄 is.general.tsx
@@ -1237,45 +1262,45 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │       │   │   ├── 📄 variable.context.tsx
     │       │   │   ├── 📄 video.frame.tsx
     │       │   │   └── 📄 video.or.image.tsx
-    │       │   ├── 📁 sentry/
+    │       │   ├── 📁 sentry
     │       │   │   ├── 📄 initialize.sentry.client.ts
     │       │   │   ├── 📄 initialize.sentry.next.basic.ts
     │       │   │   └── 📄 initialize.sentry.server.ts
-    │       │   ├── 📁 toaster/
+    │       │   ├── 📁 toaster
     │       │   │   └── 📄 toaster.tsx
-    │       │   └── 📁 translation/
-    │       │       ├── 📁 locales/
-    │       │       │   ├── 📁 ar/
+    │       │   └── 📁 translation
+    │       │       ├── 📁 locales
+    │       │       │   ├── 📁 ar
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 bn/
+    │       │       │   ├── 📁 bn
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 de/
+    │       │       │   ├── 📁 de
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 en/
+    │       │       │   ├── 📁 en
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 es/
+    │       │       │   ├── 📁 es
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 fr/
+    │       │       │   ├── 📁 fr
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 he/
+    │       │       │   ├── 📁 he
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 it/
+    │       │       │   ├── 📁 it
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 ja/
+    │       │       │   ├── 📁 ja
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 ka_ge/
+    │       │       │   ├── 📁 ka_ge
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 ko/
+    │       │       │   ├── 📁 ko
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 pt/
+    │       │       │   ├── 📁 pt
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 ru/
+    │       │       │   ├── 📁 ru
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 tr/
+    │       │       │   ├── 📁 tr
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   ├── 📁 vi/
+    │       │       │   ├── 📁 vi
     │       │       │   │   └── ⚙️ translation.json
-    │       │       │   └── 📁 zh/
+    │       │       │   └── 📁 zh
     │       │       │       └── ⚙️ translation.json
     │       │       ├── 📄 get.transation.service.client.ts
     │       │       ├── 📄 get.translation.service.backend.ts
@@ -1286,10 +1311,10 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     │       ├── 📝 README.md
     │       ├── ⚙️ tsconfig.json
     │       └── ⚙️ tsconfig.lib.json
-    ├── 📁 reports/
+    ├── 📁 reports
     │   └── ⚙️ junit.xml
-    ├── 📁 var/
-    │   └── 📁 docker/
+    ├── 📁 var
+    │   └── 📁 docker
     │       ├── 📄 create-namespace-default.sh
     │       ├── 📄 docker-build.sh
     │       ├── 📄 docker-create.sh
@@ -1308,12 +1333,14 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     ├── 📝 CODE_OF_CONDUCT.md
     ├── 📝 CONTRIBUTING.md
     ├── 📄 Dockerfile.dev
+    ├── 📄 File Tree: postiz-app
     ├── 📝 ICLA.md
     ├── 📄 LICENSE
     ├── 📝 README.md
     ├── 📝 SECURITY.md
     ├── ⚙️ chatgpt-app-submission.json
     ├── ⚙️ docker-compose.dev.yaml
+    ├── ⚙️ docker-compose.local.yaml
     ├── ⚙️ docker-compose.yaml
     ├── 📄 eslint.config.mjs
     ├── ⚙️ i18n.json
@@ -1325,8 +1352,10 @@ Root path: /home/maimoon-amin/Antigravity code/postiz-app
     ├── ⚙️ pnpm-workspace.yaml
     ├── ⚙️ railway.toml
     ├── 📄 sonar-project.properties
+    ├── 📄 start-local.sh
     ├── ⚙️ tsconfig.base.json
     ├── ⚙️ tsconfig.json
     └── 📄 version.txt
+```
 
-────────────────────────────────────────────────────────────────────────────────
+---

@@ -1,6 +1,12 @@
 'use client';
 
 import { createContext, FC, ReactNode, useContext, useEffect } from 'react';
+export interface SocialEnvVarStatus {
+  configured: boolean;
+  masked?: string;
+  value?: string;
+}
+
 interface VariableContextInterface {
   stripeClient: string;
   billingEnabled: boolean;
@@ -35,6 +41,7 @@ interface VariableContextInterface {
   googleAdsId?: string;
   googleAdsTrialTracking?: string;
   recaptchaSiteKey?: string;
+  socialEnvConfig?: Record<string, SocialEnvVarStatus>;
 }
 const VariableContext = createContext({
   stripeClient: '',
@@ -69,6 +76,7 @@ const VariableContext = createContext({
   sentryDsn: '',
   extensionId: '',
   recaptchaSiteKey: '',
+  socialEnvConfig: {},
 } as VariableContextInterface);
 export const VariableContextComponent: FC<
   VariableContextInterface & {
