@@ -206,8 +206,32 @@ export const AgentList: FC<{ onChange: (arr: any[]) => void }> = ({
 export interface RecentThreadItem {
   id: string;
   title: string;
-  updatedAt?: number;
+  createdAt?: string | number;
+  updatedAt?: string | number;
 }
+
+export const formatChatTimestamp = (timestamp?: string | number): string => {
+  if (!timestamp) return '';
+  const date =
+    typeof timestamp === 'number' ? new Date(timestamp) : new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHours = Math.floor(diffMin / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSec < 60) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return `${date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })}`;
+};
 
 interface PropertiesContextType {
   properties: any[];
@@ -216,6 +240,7 @@ interface PropertiesContextType {
   sessionTitles: Record<string, string>;
   activeSessions: RecentThreadItem[];
   startNewChat: () => void;
+  deleteChatSession: (threadId: string) => Promise<void>;
   recordChatActivity: (threadId: string, promptText?: string) => void;
   refreshThreads: () => void;
 }
@@ -241,6 +266,7 @@ export const PropertiesContext = createContext<PropertiesContextType>({
   sessionTitles: {},
   activeSessions: [],
   startNewChat: () => {},
+  deleteChatSession: async () => {},
   recordChatActivity: () => {},
   refreshThreads: () => {},
 });
@@ -272,6 +298,7 @@ export const Agent: FC<{ children: ReactNode }> = ({ children }) => {
     }
   );
 
+  const fetch = useFetch();
   const router = useRouter();
   const pathname = usePathname();
   const { mutate } = useSWRConfig();
@@ -279,6 +306,69 @@ export const Agent: FC<{ children: ReactNode }> = ({ children }) => {
   const refreshThreads = useCallback(() => {
     mutate('threads');
   }, [mutate]);
+
+  const deleteChatSession = useCallback(
+    async (threadId: string) => {
+      if (!threadId) return;
+
+      // Optimistically update local active sessions state & session storage
+      setActiveSessions((prev) => {
+        const next = prev.filter((s) => s.id !== threadId);
+        if (typeof window !== 'undefined') {
+          try {
+            window.sessionStorage.setItem(
+              CHAT_SESSIONS_STORAGE_KEY,
+              JSON.stringify(next)
+            );
+          } catch {}
+        }
+        return next;
+      });
+
+      // Optimistically clean stored titles
+      setSessionTitles((prev) => {
+        const next = { ...prev };
+        delete next[threadId];
+        if (typeof window !== 'undefined') {
+          try {
+            window.sessionStorage.setItem(
+              CHAT_TITLES_STORAGE_KEY,
+              JSON.stringify(next)
+            );
+          } catch {}
+        }
+        return next;
+      });
+
+      // Optimistically update SWR threads cache
+      mutate(
+        'threads',
+        (current: any) => {
+          if (!current?.threads) return current;
+          return {
+            ...current,
+            threads: current.threads.filter((t: any) => t.id !== threadId),
+          };
+        },
+        false
+      );
+
+      // Perform backend deletion
+      try {
+        await fetch(`/copilot/${threadId}`, { method: 'DELETE' });
+      } catch (err) {
+        console.error('Failed to delete thread on server:', err);
+      }
+
+      mutate('threads');
+
+      // If the currently viewed thread was deleted, transition to a new chat
+      if (pathname.includes(threadId)) {
+        startNewChat();
+      }
+    },
+    [fetch, mutate, pathname]
+  );
 
   const recordChatActivity = useCallback(
     (threadId: string, promptText?: string) => {
@@ -351,6 +441,7 @@ export const Agent: FC<{ children: ReactNode }> = ({ children }) => {
       sessionTitles,
       activeSessions,
       startNewChat,
+      deleteChatSession,
       recordChatActivity,
       refreshThreads,
     }),
@@ -361,6 +452,7 @@ export const Agent: FC<{ children: ReactNode }> = ({ children }) => {
       sessionTitles,
       activeSessions,
       startNewChat,
+      deleteChatSession,
       recordChatActivity,
       refreshThreads,
     ]
@@ -386,6 +478,7 @@ const Threads: FC = () => {
     sessionTitles,
     activeSessions,
     startNewChat,
+    deleteChatSession,
     refreshThreads,
   } = useContext(PropertiesContext);
 
@@ -401,17 +494,22 @@ const Threads: FC = () => {
     refreshInterval: 15000,
   });
 
-  useEffect(() => {
-    refreshThreads();
-  }, [id, refreshThreads]);
-
   const effectiveActiveId = id === 'new' ? newSessionId : id;
 
   const mergedThreads = useMemo(() => {
-    const serverThreads: Array<{ id: string; title?: string }> =
-      data?.threads || [];
+    const serverThreads: Array<{
+      id: string;
+      title?: string;
+      createdAt?: string | number;
+      updatedAt?: string | number;
+    }> = data?.threads || [];
     const seen = new Set<string>();
-    const result: Array<{ id: string; title: string; isActive: boolean }> = [];
+    const result: Array<{
+      id: string;
+      title: string;
+      isActive: boolean;
+      timestamp?: string | number;
+    }> = [];
 
     // Include optimistic/active sessions from the current session first if not yet on server
     for (const local of activeSessions) {
@@ -423,6 +521,7 @@ const Threads: FC = () => {
           title:
             sessionTitles[local.id] || local.title || 'New conversation',
           isActive: local.id === effectiveActiveId,
+          timestamp: local.updatedAt || local.createdAt || Date.now(),
         });
       }
     }
@@ -435,10 +534,16 @@ const Threads: FC = () => {
         sessionTitles[item.id] ||
         activeSessions.find((s) => s.id === item.id)?.title ||
         'Untitled conversation';
+      const localMatch = activeSessions.find((s) => s.id === item.id);
       result.push({
         id: item.id,
         title: serverTitle || fallbackTitle,
         isActive: item.id === effectiveActiveId,
+        timestamp:
+          item.updatedAt ||
+          item.createdAt ||
+          localMatch?.updatedAt ||
+          localMatch?.createdAt,
       });
     }
 
@@ -534,45 +639,89 @@ const Threads: FC = () => {
             </div>
           )}
 
-          {mergedThreads.map((p) => (
-            <Link
-              className={clsx(
-                'group flex items-center gap-[8px] px-[10px] py-[8px] rounded-[10px] text-[13.5px] transition-all cursor-pointer mobile:shrink-0 mobile:max-w-[200px] border',
-                p.isActive
-                  ? 'bg-newBgColor border-btnPrimary/45 text-textColor font-[500]'
-                  : 'border-transparent hover:bg-newBgColor/70 hover:border-newTableBorder text-textColor/80 hover:text-textColor'
-              )}
-              href={`/agents/${p.id}`}
-              key={p.id}
-              title={p.title}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 16 16"
-                fill="none"
+          {mergedThreads.map((p) => {
+            const timeLabel = formatChatTimestamp(p.timestamp);
+            return (
+              <Link
                 className={clsx(
-                  'shrink-0 transition-opacity',
+                  'group flex items-center gap-[8px] px-[10px] py-[8px] rounded-[10px] text-[13.5px] transition-all cursor-pointer mobile:shrink-0 mobile:max-w-[200px] border relative',
                   p.isActive
-                    ? 'text-btnPrimary opacity-100'
-                    : 'text-textColor/45 group-hover:text-textColor/75'
+                    ? 'bg-newBgColor border-btnPrimary/45 text-textColor font-[500]'
+                    : 'border-transparent hover:bg-newBgColor/70 hover:border-newTableBorder text-textColor/80 hover:text-textColor'
                 )}
+                href={`/agents/${p.id}`}
+                key={p.id}
+                title={p.title}
               >
-                <path
-                  d="M2.5 4.5C2.5 3.67157 3.17157 3 4 3H12C12.8284 3 13.5 3.67157 13.5 4.5V9.5C13.5 10.3284 12.8284 11 12 11H6L3 13.5V11C2.72386 11 2.5 10.7761 2.5 10.5V4.5Z"
-                  stroke="currentColor"
-                  strokeWidth="1.35"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="flex-1 overflow-ellipsis overflow-hidden whitespace-nowrap">
-                {p.title}
-              </span>
-              {p.isActive && (
-                <span className="w-[6px] h-[6px] rounded-full bg-emerald-400 shrink-0" />
-              )}
-            </Link>
-          ))}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  className={clsx(
+                    'shrink-0 transition-opacity mt-[1px]',
+                    p.isActive
+                      ? 'text-btnPrimary opacity-100'
+                      : 'text-textColor/45 group-hover:text-textColor/75'
+                  )}
+                >
+                  <path
+                    d="M2.5 4.5C2.5 3.67157 3.17157 3 4 3H12C12.8284 3 13.5 3.67157 13.5 4.5V9.5C13.5 10.3284 12.8284 11 12 11H6L3 13.5V11C2.72386 11 2.5 10.7761 2.5 10.5V4.5Z"
+                    stroke="currentColor"
+                    strokeWidth="1.35"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                  <span className="overflow-ellipsis overflow-hidden whitespace-nowrap text-[13px] leading-snug">
+                    {p.title}
+                  </span>
+                  {timeLabel && (
+                    <span className="text-[10.5px] text-textColor/45 leading-tight group-hover:text-textColor/60 transition-colors">
+                      {timeLabel}
+                    </span>
+                  )}
+                </div>
+
+                {p.isActive && (
+                  <span className="w-[6px] h-[6px] rounded-full bg-emerald-400 shrink-0" />
+                )}
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteChatSession(p.id);
+                  }}
+                  title={t('delete_chat', 'Delete conversation')}
+                  className="opacity-0 group-hover:opacity-100 p-[3px] rounded-[5px] hover:bg-red-500/20 hover:text-red-400 text-textColor/40 transition-all shrink-0 cursor-pointer"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                  >
+                    <path
+                      d="M2.5 4H13.5M5.5 4V2.667C5.5 2.298 5.798 2 6.167 2H9.833C10.202 2 10.5 2.298 10.5 2.667V4M12.167 4V13.333C12.167 13.702 11.869 14 11.5 14H4.5C4.131 14 3.833 13.702 3.833 13.333V4"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M6.5 7V11M9.5 7V11"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </Link>
+            );
+          })}
 
           {!isBrandNewUnsavedSession && mergedThreads.length === 0 && (
             <div className="px-[10px] py-[16px] text-center text-[12.5px] text-textColor/45 mobile:py-[4px]">

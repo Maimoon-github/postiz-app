@@ -46,9 +46,10 @@ import { ExistingDataContextProvider } from '@gitroom/frontend/components/launch
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { hasExtension } from '@gitroom/helpers/utils/has.extension';
 
-export const AgentChat: FC = () => {
+export const AgentChat: FC<{ id?: string }> = ({ id: propId }) => {
   const { backendUrl } = useVariables();
   const params = useParams<{ id: string }>();
+  const id = propId || params?.id || 'new';
   const {
     properties,
     newSessionId,
@@ -57,12 +58,11 @@ export const AgentChat: FC = () => {
   } = useContext(PropertiesContext);
   const t = useT();
 
-  const effectiveThreadId =
-    params.id === 'new' ? newSessionId || undefined : params.id;
-  const copilotInstanceKey =
-    params.id === 'new'
-      ? `new-${newChatResetCount}-${newSessionId}`
-      : ` existing-${params.id}`;
+  const isNew = id === 'new';
+  const effectiveThreadId = isNew ? newSessionId || undefined : id;
+  const copilotInstanceKey = isNew
+    ? `new-${newChatResetCount}-${newSessionId}`
+    : `existing-${id}`;
 
   const welcomeMessage = t(
     'agent_welcome_message',
@@ -91,7 +91,7 @@ You can also use me as an MCP Server, check Settings >> Agents / Dev`
       }}
     >
       <Hooks />
-      <LoadMessages id={params.id} />
+      <LoadMessages id={id} />
       <div
         style={
           {
@@ -120,7 +120,7 @@ You can also use me as an MCP Server, check Settings >> Agents / Dev`
                 'agent_input_placeholder',
                 'Ask Postiz Agent to draft, schedule, or analyze posts...'
               ),
-              initial: welcomeMessage,
+              initial: isNew ? welcomeMessage : '',
             }}
             RenderMessage={CustomRenderMessage}
             AssistantMessage={RefinedAssistantMessage}
@@ -273,133 +273,182 @@ const parseReasoningAndAnswer = (
 };
 
 const LoadMessages: FC<{ id: string }> = ({ id }) => {
-  const { messages, setMessages } = useCopilotChatInternal();
+  const { messages, setMessages, agent } = useCopilotChatInternal();
   const fetch = useFetch();
+  const [isLoadingHistory, setIsLoadingHistory] = useState(id !== 'new');
   const currentId = useRef<string | null>(null);
   const loaded = useRef<{ id: string; messages: CopilotMessage[] } | null>(
     null
   );
 
-  const loadMessages = useCallback(
-    async (idToSet: string) => {
-      const response = await fetch(`/copilot/${idToSet}/list`);
-      if (!response.ok) return;
-      const data = await response.json();
-      const rawMessages: any[] = data.messages || [];
+  const agentRef = useRef(agent);
+  agentRef.current = agent;
+  const setMessagesRef = useRef(setMessages);
+  setMessagesRef.current = setMessages;
 
-      const list: CopilotMessage[] = [];
-      let pendingReasoning: string[] = [];
+  useEffect(() => {
+    let isCancelled = false;
+    currentId.current = id;
 
-      for (const p of rawMessages) {
-        if (!p) continue;
-        if (p.role === 'user') {
-          if (pendingReasoning.length) {
-            list.push(
-              new TextMessage({
-                id: makeId(12),
-                role: 'assistant' as any,
-                content: `<think>${pendingReasoning.join('\n\n')}</think>`,
-              })
-            );
-            pendingReasoning = [];
+    if (id === 'new') {
+      loaded.current = null;
+      setMessagesRef.current([]);
+      if ((agentRef.current as any)?.setMessages) {
+        (agentRef.current as any).setMessages([]);
+      }
+      setIsLoadingHistory(false);
+      return;
+    }
+
+    setIsLoadingHistory(true);
+
+    (async () => {
+      try {
+        const response = await fetch(`/copilot/${id}/list`);
+        if (isCancelled || currentId.current !== id) return;
+        if (!response.ok) {
+          setIsLoadingHistory(false);
+          return;
+        }
+        const data = await response.json();
+        if (isCancelled || currentId.current !== id) return;
+
+        const rawMessages: any[] = data.messages || [];
+        const list: CopilotMessage[] = [];
+        let pendingReasoning: string[] = [];
+
+        for (const p of rawMessages) {
+          if (!p) continue;
+          if (p.role === 'user') {
+            if (pendingReasoning.length) {
+              list.push(
+                new TextMessage({
+                  id: makeId(12),
+                  role: 'assistant' as any,
+                  content: `<think>${pendingReasoning.join('\n\n')}</think>`,
+                })
+              );
+              pendingReasoning = [];
+            }
+            const userText = extractText(p.content);
+            if (userText.trim()) {
+              list.push(
+                new TextMessage({
+                  id: p.id || makeId(12),
+                  content: userText,
+                  role: p.role,
+                })
+              );
+            }
+            continue;
           }
-          const userText = extractText(p.content);
-          if (userText.trim()) {
+
+          if (p.role === 'reasoning') {
+            const rText =
+              extractText(p.content) || extractReasoningFromParts(p.content);
+            if (rText.trim()) pendingReasoning.push(rText.trim());
+            continue;
+          }
+
+          if (p.role === 'assistant') {
+            const text = extractText(p.content);
+            const partReasoning =
+              extractReasoningFromParts(p.content) ||
+              (typeof p.reasoning === 'string' ? p.reasoning : '');
+            if (partReasoning.trim()) {
+              pendingReasoning.push(partReasoning.trim());
+            }
+
+            if (!text.trim()) {
+              continue;
+            }
+
+            const hasInlineThink = /<(?:think|thinking)>/i.test(text);
+            const combinedContent =
+              pendingReasoning.length && !hasInlineThink
+                ? `<think>${pendingReasoning.join('\n\n')}</think>\n\n${text}`
+                : text;
+            pendingReasoning = [];
+
             list.push(
               new TextMessage({
                 id: p.id || makeId(12),
-                content: userText,
+                content: combinedContent,
                 role: p.role,
               })
             );
           }
-          continue;
         }
 
-        if (p.role === 'reasoning') {
-          const rText = extractText(p.content) || extractReasoningFromParts(p.content);
-          if (rText.trim()) pendingReasoning.push(rText.trim());
-          continue;
-        }
-
-        if (p.role === 'assistant') {
-          const text = extractText(p.content);
-          const partReasoning =
-            extractReasoningFromParts(p.content) ||
-            (typeof p.reasoning === 'string' ? p.reasoning : '');
-          if (partReasoning.trim()) {
-            pendingReasoning.push(partReasoning.trim());
-          }
-
-          if (!text.trim()) {
-            // Tool-call-only step; hold any reasoning to attach to the final assistant message
-            continue;
-          }
-
-          const hasInlineThink = /<(?:think|thinking)>/i.test(text);
-          const combinedContent =
-            pendingReasoning.length && !hasInlineThink
-              ? `<think>${pendingReasoning.join('\n\n')}</think>\n\n${text}`
-              : text;
-          pendingReasoning = [];
-
+        if (pendingReasoning.length) {
           list.push(
             new TextMessage({
-              id: p.id || makeId(12),
-              content: combinedContent,
-              role: p.role,
+              id: makeId(12),
+              role: 'assistant' as any,
+              content: `<think>${pendingReasoning.join('\n\n')}</think>`,
             })
           );
         }
+
+        if (isCancelled || currentId.current !== id) return;
+
+        loaded.current = { id, messages: list };
+        setMessagesRef.current(list);
+
+        if ((agentRef.current as any)?.setMessages) {
+          (agentRef.current as any).setMessages(
+            list.map((m: any) => ({
+              id: m.id,
+              role: m.role,
+              content: m.content,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to load past chat messages:', err);
+      } finally {
+        if (!isCancelled && currentId.current === id) {
+          setIsLoadingHistory(false);
+        }
       }
+    })();
 
-      if (pendingReasoning.length) {
-        list.push(
-          new TextMessage({
-            id: makeId(12),
-            role: 'assistant' as any,
-            content: `<think>${pendingReasoning.join('\n\n')}</think>`,
-          })
-        );
-      }
+    return () => {
+      isCancelled = true;
+    };
+  }, [id, fetch]);
 
-      if (currentId.current !== idToSet) {
-        return;
-      }
-
-      loaded.current = { id: idToSet, messages: list };
-      setMessages(list);
-    },
-    [fetch, setMessages]
-  );
-
+  // Handle rehydration if agent re-connects or resets
   useEffect(() => {
-    currentId.current = id;
-    if (id === 'new') {
-      loaded.current = { id, messages: [] };
-      setMessages([]);
-      return;
+    if (id === 'new') return;
+    if (loaded.current?.id === id && loaded.current.messages.length > 0) {
+      if (!messages.length && !isLoadingHistory) {
+        setMessagesRef.current(loaded.current.messages);
+        if ((agentRef.current as any)?.setMessages) {
+          (agentRef.current as any).setMessages(
+            loaded.current.messages.map((m: any) => ({
+              id: m.id,
+              role: m.role,
+              content: m.content,
+            }))
+          );
+        }
+      }
     }
-    loaded.current = null;
-    loadMessages(id);
-  }, [id, loadMessages, setMessages]);
+  }, [messages.length, id, isLoadingHistory]);
 
-  // CopilotKit resolves loadAgentState to an empty list for Mastra local agents
-  // and can clobber the messages we hold, depending on which request resolves last
-  useEffect(() => {
-    if (loaded.current?.id !== id) {
-      return;
-    }
-
-    if (messages.length) {
-      loaded.current.messages = messages as any;
-      return;
-    }
-
-    if (loaded.current.messages.length) {
-      setMessages(loaded.current.messages);
-    }
-  }, [messages, id, setMessages]);
+  if (isLoadingHistory && id !== 'new') {
+    return (
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-newBgColorInner/80 backdrop-blur-[1px] pointer-events-none">
+        <div className="flex items-center gap-[8px] px-[16px] py-[10px] rounded-[10px] bg-newBgColor border border-newTableBorder shadow-md">
+          <span className="w-[14px] h-[14px] rounded-full border-2 border-btnPrimary border-t-transparent animate-spin" />
+          <span className="text-[12.5px] font-[500] text-textColor/75">
+            Loading conversation...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 };
@@ -534,6 +583,144 @@ const collectTurnReasoning = (
   return collected.join('\n\n');
 };
 
+interface AgentActionMeta {
+  name: string;
+  label: string;
+  icon: string;
+  status: 'completed' | 'running';
+  args?: any;
+}
+
+const KNOWN_AGENT_CAPABILITIES: Record<
+  string,
+  { label: string; icon: string }
+> = {
+  integrationSchedulePostTool: { label: 'Schedule Social Post', icon: '📅' },
+  postsListTool: { label: 'List Scheduled Posts', icon: '📋' },
+  postSettingsTool: { label: 'Update Post Settings', icon: '⚙️' },
+  deletePostTool: { label: 'Delete Scheduled Post', icon: '🗑️' },
+  generateImageTool: { label: 'Generate AI Image', icon: '🎨' },
+  generateVideoTool: { label: 'Generate AI Video', icon: '🎬' },
+  generateVideoOptionsTool: { label: 'Video Generation Options', icon: '🎞️' },
+  clippingTool: { label: 'Video Clipping Tool', icon: '✂️' },
+  knowledgeRetrieveTool: { label: 'Knowledge Base Search', icon: '🔍' },
+  integrationListTool: { label: 'Connected Channels', icon: '🌐' },
+  integrationValidationTool: { label: 'Channel Validation', icon: '🛡️' },
+  groupListTool: { label: 'Customer Channel Groups', icon: '👥' },
+  uploadFromUrlTool: { label: 'Import Media from URL', icon: '🔗' },
+  mediaListTool: { label: 'Media Library Search', icon: '📁' },
+  manualPosting: { label: 'Manual Post Composer', icon: '✍️' },
+};
+
+const extractAgentActions = (message: any): AgentActionMeta[] => {
+  const actions: AgentActionMeta[] = [];
+  if (!message) return actions;
+
+  // 1. Check raw tool calls (from OpenAI adapter or Mastra)
+  const rawToolCalls =
+    (message as any)?.toolCalls || (message as any)?.tool_calls || [];
+  if (Array.isArray(rawToolCalls)) {
+    for (const tc of rawToolCalls) {
+      const fnName = tc?.function?.name || tc?.name;
+      if (!fnName) continue;
+      const meta = KNOWN_AGENT_CAPABILITIES[fnName] || {
+        label: fnName
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, (s: string) => s.toUpperCase()),
+        icon: '⚡',
+      };
+      let argsObj: any = null;
+      try {
+        argsObj =
+          typeof tc?.function?.arguments === 'string'
+            ? JSON.parse(tc.function.arguments)
+            : tc?.function?.arguments || tc?.args;
+      } catch {
+        argsObj = tc?.function?.arguments;
+      }
+      actions.push({
+        name: fnName,
+        label: meta.label,
+        icon: meta.icon,
+        status: 'completed',
+        args: argsObj,
+      });
+    }
+  }
+
+  // 2. Check parts in content (Mastra format 2)
+  const rawParts = (message as any)?.content?.parts || [];
+  if (Array.isArray(rawParts)) {
+    for (const part of rawParts) {
+      if (part?.type === 'tool-call' || part?.type === 'tool_call') {
+        const toolName = part?.toolName || part?.name || part?.function?.name;
+        if (!toolName) continue;
+        const meta = KNOWN_AGENT_CAPABILITIES[toolName] || {
+          label: toolName
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, (s: string) => s.toUpperCase()),
+          icon: '⚡',
+        };
+        actions.push({
+          name: toolName,
+          label: meta.label,
+          icon: meta.icon,
+          status: 'completed',
+          args: part?.args || part?.input,
+        });
+      }
+    }
+  }
+
+  return actions;
+};
+
+const AgentActionBadge: FC<{ action: AgentActionMeta }> = ({ action }) => {
+  const [open, setOpen] = useState(false);
+  const hasArgs =
+    action.args &&
+    (typeof action.args === 'object'
+      ? Object.keys(action.args).length > 0
+      : String(action.args).trim().length > 0);
+
+  return (
+    <div className="rounded-[10px] bg-newBgColor/80 border border-newTableBorder/80 px-[10px] py-[7px] text-[12px] my-[3px] flex flex-col gap-[4px] transition-all">
+      <div
+        className={clsx(
+          'flex items-center justify-between select-none',
+          hasArgs && 'cursor-pointer'
+        )}
+        onClick={() => hasArgs && setOpen(!open)}
+      >
+        <div className="flex items-center gap-[7px]">
+          <span className="text-[13px]">{action.icon}</span>
+          <span className="font-[600] text-textColor/90 text-[12.5px]">
+            {action.label}
+          </span>
+        </div>
+        <div className="flex items-center gap-[6px]">
+          <span className="inline-flex items-center gap-[4px] text-[10.5px] font-[500] px-[7px] py-[1.5px] rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="w-[5px] h-[5px] rounded-full bg-emerald-400" />
+            Action Executed
+          </span>
+          {hasArgs && (
+            <span className="text-textColor/40 text-[10px] font-mono">
+              {open ? '▲' : '▼'}
+            </span>
+          )}
+        </div>
+      </div>
+      {open && hasArgs && (
+        <pre className="text-[11px] p-[8px] rounded-[6px] bg-black/45 text-textColor/80 font-mono overflow-x-auto max-h-[140px] scrollbar border border-newTableBorder/40 mt-[3px]">
+          {typeof action.args === 'string'
+            ? action.args
+            : JSON.stringify(action.args, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+};
+
 const RefinedAssistantMessage: FC<
   AssistantMessageProps & {
     turnReasoning?: string;
@@ -570,6 +757,11 @@ const RefinedAssistantMessage: FC<
     [rawContent, combinedExternalReasoning]
   );
 
+  const agentActions = useMemo(
+    () => extractAgentActions(message),
+    [message]
+  );
+
   const subComponent = message?.generativeUI?.() ?? props.subComponent;
   const subComponentPosition = message?.generativeUIPosition ?? 'after';
   const renderBefore = subComponent && subComponentPosition === 'before';
@@ -588,7 +780,7 @@ const RefinedAssistantMessage: FC<
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!reasoning && !answer && !subComponent && !isLoading) {
+  if (!reasoning && !answer && !subComponent && !isLoading && !agentActions.length) {
     return null;
   }
 
@@ -627,6 +819,15 @@ const RefinedAssistantMessage: FC<
             reasoning={reasoning}
             isStreamingThought={isStreamingThought}
           />
+        )}
+
+        {/* Agent Capabilities & Action Badges */}
+        {agentActions.length > 0 && (
+          <div className="flex flex-col gap-[4px] my-[6px]">
+            {agentActions.map((action, idx) => (
+              <AgentActionBadge key={idx} action={action} />
+            ))}
+          </div>
         )}
 
         {/* Final Answer Content */}
@@ -813,6 +1014,21 @@ const CustomRenderMessage: FC<RenderMessageProps> = (props) => {
         markdownTagRenderers={markdownTagRenderers}
         ImageRenderer={ImageRenderer}
       />
+    );
+  }
+
+  if (message.role === 'tool') {
+    const toolText = extractText(message.content);
+    return (
+      <div className="w-full max-w-[92%] my-[3px] px-[12px] py-[7px] rounded-[10px] bg-newBgColor/60 border border-newTableBorder/60 text-[12px] text-textColor/75 flex items-center justify-between">
+        <div className="flex items-center gap-[6px]">
+          <span className="w-[6px] h-[6px] rounded-full bg-emerald-400" />
+          <span className="font-[600] text-textColor/85">Tool Result</span>
+        </div>
+        <span className="text-[11px] text-textColor/50 truncate max-w-[240px] font-mono">
+          {toolText.slice(0, 60)}
+        </span>
+      </div>
     );
   }
 

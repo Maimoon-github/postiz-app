@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Req,
   Res,
   Query,
@@ -53,12 +54,9 @@ export class CopilotController {
   ) {}
   @Post('/chat')
   chatAgent(@Req() req: Request, @Res() res: Response) {
-    if (
-      process.env.OPENAI_API_KEY === undefined ||
-      process.env.OPENAI_API_KEY === ''
-    ) {
+    if (!process.env.OPENAI_API_KEY && !process.env.OPENAI_BASE_URL) {
       Logger.warn('OpenAI API key not set, chat functionality will not work');
-      return;
+      return res.status(503).json({ error: 'LLM not configured' });
     }
 
     const copilotRuntimeHandler = copilotRuntimeNodeHttpEndpoint({
@@ -81,12 +79,9 @@ export class CopilotController {
     @Res() res: Response,
     @GetOrgFromRequest() organization: Organization
   ) {
-    if (
-      process.env.OPENAI_API_KEY === undefined ||
-      process.env.OPENAI_API_KEY === ''
-    ) {
+    if (!process.env.OPENAI_API_KEY && !process.env.OPENAI_BASE_URL) {
       Logger.warn('OpenAI API key not set, chat functionality will not work');
-      return;
+      return res.status(503).json({ error: 'LLM not configured' });
     }
     const mastra = await this._mastraService.mastra();
     const requestContext = new RequestContext<ChannelsContext>();
@@ -168,7 +163,26 @@ export class CopilotController {
       threads: list.threads.map((p) => ({
         id: p.id,
         title: p.title,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
       })),
     };
+  }
+
+  @Delete('/:thread')
+  @CheckPolicies([AuthorizationActions.Create, Sections.AI])
+  async deleteThread(
+    @GetOrgFromRequest() organization: Organization,
+    @Param('thread') threadId: string
+  ) {
+    const mastra = await this._mastraService.mastra();
+    const memory = await mastra.getAgent('postiz').getMemory();
+    try {
+      await memory.deleteThread(threadId);
+      return { success: true };
+    } catch (err) {
+      Logger.warn(`Could not delete thread ${threadId}: ${err}`);
+      return { success: false, error: (err as any)?.message };
+    }
   }
 }
