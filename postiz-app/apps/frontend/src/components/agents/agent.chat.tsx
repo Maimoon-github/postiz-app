@@ -222,6 +222,11 @@ const extractText = (content: any): string => {
     if (content.content && typeof content.content === 'object')
       return extractText(content.content);
     if (content.text) return content.text;
+    try {
+      return JSON.stringify(content);
+    } catch {
+      return String(content);
+    }
   }
   return String(content);
 };

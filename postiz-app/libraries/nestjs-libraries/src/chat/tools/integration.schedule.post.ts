@@ -8,6 +8,7 @@ import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import { AllProvidersSettings } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/all.providers.settings';
 import { Integration } from '@prisma/client';
 import { checkAuth } from '@gitroom/nestjs-libraries/chat/auth.context';
+import { timer } from '@gitroom/helpers/utils/timer';
 import {
   ValidUrlExtension,
   ValidUrlPath,
@@ -91,8 +92,19 @@ A single LinkedIn post with one comment
 - postsAndComments array length will be one
 
 Do not use this to update or delete existing posts.
-On success, each item in output contains a previewUrl the user can open to see the post.
 If validation fails, the result contains output.errors describing what to fix; the call can be retried with corrected parameters.
+
+CRITICAL INSTRUCTIONS FOR REPORTING POST STATUS:
+1. "state === 'PUBLISHED'" AND "liveUrl" is NOT null:
+   The post is confirmed LIVE on the social network. Share the "liveUrl" (e.g. LinkedIn feed link).
+2. "state === 'QUEUE'" OR "state === 'DRAFT'" (or "liveUrl" is null):
+   The post has NOT been published to the social network yet! It is scheduled, drafted, or queued locally inside Postiz.
+   DO NOT claim it is "Successfully published"! Instead, tell the user: "Your post is scheduled/queued locally in Postiz" and provide "previewUrl" as the "Internal Postiz Preview".
+3. "previewUrl" (${process.env.FRONTEND_URL}/p/...) is strictly an internal Postiz preview. It is NEVER the live external social post URL.
+4. Channel Type Awareness:
+   - "linkedin" = Personal LinkedIn Profile
+   - "linkedin-page" = LinkedIn Company/Organization Page
+   If the user asked to post to a "LinkedIn page" but the channel platform is "linkedin" (personal profile), make sure to clarify that it was posted to their personal LinkedIn profile ("channelName"), NOT a LinkedIn Company Page.
 `,
       inputSchema: z.object({
         socialPost: z
@@ -161,10 +173,27 @@ If validation fails, the result contains output.errors describing what to fix; t
             z.object({
               postId: z.string(),
               integration: z.string(),
+              platform: z.string().optional(),
+              channelName: z.string().optional(),
+              channelType: z.string().optional(),
+              state: z
+                .string()
+                .describe('PUBLISHED, QUEUE, DRAFT, or ERROR'),
+              liveUrl: z
+                .string()
+                .nullable()
+                .describe(
+                  'The external live post URL on the social platform (e.g. LinkedIn feed link). Only present when state is PUBLISHED. NEVER report a post as successfully published or live unless liveUrl is non-null!'
+                ),
               previewUrl: z
                 .string()
                 .describe(
-                  'Public preview page of the created post, share it with the user'
+                  'Internal Postiz dashboard/calendar preview URL. This is NOT a live social media URL.'
+                ),
+              statusDescription: z
+                .string()
+                .describe(
+                  'Human-readable explanation of whether the post is live on the social platform or merely scheduled/queued/drafted in Postiz'
                 ),
             })
           )
@@ -283,13 +312,78 @@ If validation fails, the result contains output.errors describing what to fix; t
               },
             ],
           }, 'MCP');
-          // Same public preview page the calendar "Preview Post" button opens.
-          finalOutput.push(
-            ...output.map((p) => ({
-              ...p,
-              previewUrl: `${process.env.FRONTEND_URL}/p/${p.postId}?share=true`,
-            }))
-          );
+          for (const p of output) {
+            let currentPost = await this._postsService.getPostById(
+              p.postId,
+              organizationId
+            );
+
+            // If the post was requested to be published 'now', give background workers a few seconds to finalize
+            if (
+              post.type === 'now' &&
+              currentPost &&
+              currentPost.state !== 'PUBLISHED' &&
+              currentPost.state !== 'ERROR'
+            ) {
+              for (let i = 0; i < 4; i++) {
+                await timer(1000);
+                currentPost = await this._postsService.getPostById(
+                  p.postId,
+                  organizationId
+                );
+                if (
+                  currentPost?.state === 'PUBLISHED' ||
+                  currentPost?.state === 'ERROR'
+                ) {
+                  break;
+                }
+              }
+            }
+
+            const isPublished = currentPost?.state === 'PUBLISHED';
+            const isError = currentPost?.state === 'ERROR';
+            const liveUrl =
+              isPublished && currentPost?.releaseURL
+                ? currentPost.releaseURL
+                : null;
+            const previewUrl = `${process.env.FRONTEND_URL}/p/${p.postId}?share=true`;
+
+            const channelType =
+              integration.providerIdentifier === 'linkedin'
+                ? 'LinkedIn Personal Profile'
+                : integration.providerIdentifier === 'linkedin-page'
+                ? 'LinkedIn Company Page'
+                : integration.name;
+
+            let statusDescription = '';
+            if (isPublished) {
+              statusDescription = `The post has been successfully published LIVE on ${channelType}! Direct live post URL: ${liveUrl}`;
+            } else if (isError) {
+              statusDescription = `The post failed to publish to ${channelType}. Error: ${
+                currentPost?.error || 'Unknown error'
+              }`;
+            } else if (post.type === 'draft') {
+              statusDescription = `The post was saved locally as a DRAFT in Postiz. It has NOT been published to ${channelType}. Local Postiz preview URL: ${previewUrl}`;
+            } else if (post.type === 'schedule') {
+              statusDescription = `The post was SCHEDULED locally in Postiz for ${post.date}. It is queued in Postiz and has NOT yet been published to ${channelType}. Local Postiz preview URL: ${previewUrl}`;
+            } else {
+              statusDescription = `The post was QUEUED locally in Postiz to go live immediately on ${channelType}. Background workers are currently processing it. It is NOT yet confirmed live on ${channelType}. The previewUrl (${previewUrl}) is an internal Postiz preview, NOT the live external post URL.`;
+            }
+
+            finalOutput.push({
+              postId: p.postId,
+              integration: p.integration,
+              platform: integration.providerIdentifier,
+              channelName: integration.name,
+              channelType,
+              state:
+                currentPost?.state ||
+                (post.type === 'draft' ? 'DRAFT' : 'QUEUE'),
+              liveUrl,
+              previewUrl,
+              statusDescription,
+            });
+          }
         }
 
         return {

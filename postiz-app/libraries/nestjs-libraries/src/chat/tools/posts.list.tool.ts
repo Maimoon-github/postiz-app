@@ -61,6 +61,15 @@ Each item has an "id", its publish date, state, error (for errored posts), conte
                 .describe('The post id'),
               publishDate: z.string().describe('UTC time'),
               state: z.string().describe('QUEUE, DRAFT, PUBLISHED or ERROR'),
+              liveUrl: z
+                .string()
+                .nullable()
+                .describe(
+                  'The external live post URL on the social platform if published (e.g. LinkedIn feed link). Null if not yet published.'
+                ),
+              previewUrl: z
+                .string()
+                .describe('The internal Postiz calendar preview URL'),
               error: z
                 .string()
                 .nullable()
@@ -99,6 +108,8 @@ Each item has an "id", its publish date, state, error (for errored posts), conte
                 .utc()
                 .format('YYYY-MM-DDTHH:mm:ss'),
               state: p.state,
+              liveUrl: p.releaseURL || null,
+              previewUrl: `${process.env.FRONTEND_URL}/p/${p.id}?share=true`,
               error: p.error ?? null,
               content: p.content || '',
               settings: parseSettings(p.settings),

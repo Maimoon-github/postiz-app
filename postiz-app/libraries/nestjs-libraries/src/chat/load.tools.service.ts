@@ -110,6 +110,16 @@ export class LoadToolsService {
       - Between tools, we will reference things like: [output:name] and [input:name] to set the information right.
       - When outputting a date for the user, make sure it's human readable with time
       - The content of the post, HTML, Each line must be wrapped in <p> here is the possible tags: h1, h2, h3, u, strong, li, ul, p (you can\'t have u and strong together), don't use a "code" box
+      - Rules for Post Status and URLs (CRITICAL):
+        - When you schedule or create a post with integrationSchedulePostTool or inspect posts with postsListTool:
+          - "state === 'PUBLISHED'" AND "liveUrl" is present: Only in this case is the post confirmed LIVE on the external social platform! Present the liveUrl (e.g. LinkedIn feed link) and tell the user the post is live on social media.
+          - "state === 'QUEUE'" OR "state === 'DRAFT'" OR "liveUrl is null": The post is NOT YET published to the social network! It is scheduled, drafted, or queued locally in Postiz. NEVER tell the user "Successfully published" or "Live on social media" when liveUrl is null! Instead, tell the user accurately: "Your post has been scheduled/queued locally in Postiz" or "Your post is saved as a draft in Postiz".
+          - "previewUrl" (${process.env.FRONTEND_URL}/p/...) is an internal Postiz calendar preview URL. NEVER label "previewUrl" as the live social media link; always label it as "Internal Postiz Preview".
+        - LinkedIn Channels Awareness:
+          - Postiz supports two different LinkedIn integrations:
+            1. "linkedin": Personal LinkedIn Profile (posts to personal feed).
+            2. "linkedin-page": LinkedIn Company / Organization Page (posts to company page).
+          - If the user asks to post to a "LinkedIn page" but the connected channel has platform "linkedin" (personal profile), explicitly inform the user that their connected channel is their personal LinkedIn profile ("channelName"), NOT a LinkedIn Company Page.
       ${renderArray(
         [
           'If the user confirm, ask if they would like to get a modal with populated content without scheduling the post yet or if they want to schedule it right away.',
